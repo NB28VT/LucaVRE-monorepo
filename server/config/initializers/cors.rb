@@ -1,4 +1,4 @@
-Rails.application.config.middleware.insert_before 0, Rack::Jam, "Rack::Cors" do
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
     allow do
       # Allow Vite's default dev server port
       origins 'http://localhost:5173', 'http://127.0.0.1:5173'

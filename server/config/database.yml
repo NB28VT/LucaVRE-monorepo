@@ -1,9 +1,16 @@
 # config/database.yml
-test:
+default: &default
   adapter: postgresql
   encoding: unicode
-  database: rails_test
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: postgres
-  password: password
+  username: nathanburgess
+  # password: password
   host: localhost
+
+development:
+  <<: *default
+  database: lucavre_development
+
+test:
+  <<: *default
+  database: lucavre_test

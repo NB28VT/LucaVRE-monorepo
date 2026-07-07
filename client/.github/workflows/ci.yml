@@ -1,0 +1,30 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  verify-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Copy code to cloud server
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24 # Matches your local NVM default
+          cache: 'npm'
+
+      - name: Install Packages
+        run: npm ci # Performs a clean, deterministic install of your dependencies
+
+      - name: Run Syntax Linter
+        run: npx oxlint@latest # Fast Rust-based check to catch coding mistakes
+
+      - name: Verify TypeScript Compiles
+        run: npm run tsc -- --noEmit # Ensures you have 0 layout type mismatches

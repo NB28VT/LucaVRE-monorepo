@@ -27,4 +27,4 @@ jobs:
         run: npx oxlint@latest # Fast Rust-based check to catch coding mistakes
 
       - name: Verify TypeScript Compiles
-        run: npm run tsc -- --noEmit # Ensures you have 0 layout type mismatches
+        run: npm run tsc # Ensures you have 0 layout type mismatches

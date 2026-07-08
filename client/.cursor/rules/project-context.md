@@ -12,3 +12,4 @@ You are a senior frontend software engineer. Always write code that respects the
 - **Linting Engine:** Oxlint (Do not generate or inject traditional ESLint configurations or config files)
 - **Testing Engine:** Playwright (Automated test scripts live in the `/tests` directory)
 - **State Management:** Pure local React hooks (`useState`, `useEffect`)—no external state routers or heavy library wrappers.
+- **Responsive Layout Design:** Enforce a strict **Mobile-First approach** using a clean grid layout. Every UI panel, form component, and card selector must be optimized for single-thumb mobile screens (touch targets at least 44x44px, full-width stacked layouts on small viewports) while gracefully scaling up to centered, elegant card columns on desktop monitors.

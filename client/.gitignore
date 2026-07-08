@@ -29,3 +29,9 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Ignore Cursor's local user-specific workspace state and caches
+.cursor/user/
+.cursor/*.json
+!.cursor/rules/
+

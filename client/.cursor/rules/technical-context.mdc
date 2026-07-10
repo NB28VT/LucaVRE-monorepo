@@ -13,3 +13,9 @@ You are a senior frontend software engineer. Always write code that respects the
 - **Testing Engine:** Playwright (Automated test scripts live in the `/tests` directory)
 - **State Management:** Pure local React hooks (`useState`, `useEffect`)—no external state routers or heavy library wrappers.
 - **Responsive Layout Design:** Enforce a strict **Mobile-First approach** using a clean grid layout. Every UI panel, form component, and card selector must be optimized for single-thumb mobile screens (touch targets at least 44x44px, full-width stacked layouts on small viewports) while gracefully scaling up to centered, elegant card columns on desktop monitors.
+
+# Playwright & Terminal Execution Constraints
+- NEVER run `npx playwright install` or try to download browser binaries (chromium, firefox, webkit) in the terminal.
+- If asked to run tests, ONLY execute the direct test runner command: `npx playwright test`. 
+- Assume all browser binaries and project dependencies are already successfully installed locally by the user.
+- Prefer letting the user execute test runner commands manually unless explicitly told to run them in the chat.

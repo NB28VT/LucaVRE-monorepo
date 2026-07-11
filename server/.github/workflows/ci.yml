@@ -10,19 +10,17 @@ jobs:
   rspec-tests:
     runs-on: ubuntu-latest
     
-    # Spin up a temporary database for the tests to talk to
     services:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_DB: rails_test
+          POSTGRES_DB: luca_vre_test # 1. Aligning the raw container database name
           POSTGRES_PASSWORD: password
         ports: ["5432:5432"]
 
-    # Pass the database credentials into the Rails environment
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:password@localhost:5432/rails_test
+      DATABASE_URL: postgres://postgres:password@localhost:5432/luca_vre_test # 2. Universal connection URL
 
     steps:
       - name: Copy code to cloud server
@@ -31,10 +29,10 @@ jobs:
       - name: Install Ruby and Gems
         uses: ruby/setup-ruby@v1
         with:
-          bundler-cache: true # Caches gems so your tests run blazing fast next time
+          bundler-cache: true
 
-      # - name: Prepare Database Schema TEMPORARILY DISABLED before initial DB setup
-      #   run: bin/rails db:schema:load
+      - name: Set up database schema
+        run: bin/rails db:test:prepare
 
       - name: Run RSpec Test Suite
         run: bundle exec rspec

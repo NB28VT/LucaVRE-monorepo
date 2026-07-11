@@ -15,4 +15,9 @@ Rails.application.routes.draw do
 
     # This is your new test endpoint:
   get "welcome/hello", to: "welcome#hello"
+
+  resources :working_sessions, only: [:index, :show, :create, :update, :destroy] do
+    resources :handling_deficits, only: [:index, :create, :show, :update, :destroy], shallow: true
+  end 
 end
+

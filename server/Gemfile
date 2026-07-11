@@ -17,6 +17,9 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# For JSON serialization
+gem 'alba', '>= 3.10'
+
 gem "anthropic", "~> 1.55.0"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
@@ -69,4 +72,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "rspec-rails", "~> 7.0" 
+  gem 'factory_bot_rails'
+  gem 'faker'
 end

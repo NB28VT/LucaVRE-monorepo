@@ -1,0 +1,33 @@
+---
+description: How to run rspec/bundler/rails commands in the sandboxed shell for this repo
+alwaysApply: true
+---
+
+# Running RSpec / Bundler / Rails commands
+
+The sandboxed shell used by the agent misconfigures the Ruby environment for this
+repo. Before running `bundle`, `rspec`, or `rails` commands, fix the environment
+in the same command:
+
+1. **Unset the sandbox's injected `BUNDLE_PATH`.** It points at an empty temp
+   cache dir (`.../cursor-sandbox-cache/.../bundle`), which breaks `bundle exec`
+   with a `Gem::Resolver::APISet::GemParser` error.
+2. **Prepend the correct Ruby 3.4.9 to `PATH`.** The sandbox's default `ruby`
+   resolves to the system Ruby 2.6.10 at `/usr/bin/ruby`, not the project's Ruby.
+   The correct interpreter lives at `~/.rubies/ruby-3.4.9/bin`.
+3. **Run commands with `required_permissions: ["full_network"]`** since bundler
+   may need network access.
+
+```bash
+export PATH="$HOME/.rubies/ruby-3.4.9/bin:$PATH"; unset BUNDLE_PATH; bundle exec rspec spec/models/handling_deficit_spec.rb
+```
+
+## New/pending migrations
+
+If a spec references a table from a migration that hasn't been applied to the
+test database yet, you'll see `PG::UndefinedTable: relation "..." does not
+exist`. Fix by migrating the test DB before running specs:
+
+```bash
+export PATH="$HOME/.rubies/ruby-3.4.9/bin:$PATH"; unset BUNDLE_PATH; RAILS_ENV=test bundle exec rails db:migrate
+```

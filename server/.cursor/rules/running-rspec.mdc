@@ -5,7 +5,9 @@ alwaysApply: true
 
 # Running RSpec / Bundler / Rails commands
 
-The sandboxed shell used by the agent misconfigures the Ruby environment for this
+Do not attempt to run rspec or any database commands on your own.
+
+<!-- The sandboxed shell used by the agent misconfigures the Ruby environment for this
 repo. Before running `bundle`, `rspec`, or `rails` commands, fix the environment
 in the same command:
 
@@ -30,4 +32,4 @@ exist`. Fix by migrating the test DB before running specs:
 
 ```bash
 export PATH="$HOME/.rubies/ruby-3.4.9/bin:$PATH"; unset BUNDLE_PATH; RAILS_ENV=test bundle exec rails db:migrate
-```
+``` -->

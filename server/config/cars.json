@@ -1,0 +1,14 @@
+{
+  "cars": [
+    { "id": "aston_martin_vantage_amr_lmgt3", "name": "Aston Martin Vantage AMR LMGT3 Evo" },
+    { "id": "bmw_m4_lmgt3", "name": "BMW M4 LMGT3" },
+    { "id": "chevrolet_corvette_z06_lmgt3_r", "name": "Chevrolet Corvette Z06 LMGT3.R" },
+    { "id": "ferrari_296_lmgt3", "name": "Ferrari 296 LMGT3" },
+    { "id": "ford_mustang_lmgt3", "name": "Ford Mustang LMGT3" },
+    { "id": "lamborghini_huracan_lmgt3_evo_2", "name": "Lamborghini Huracán LMGT3 Evo 2" },
+    { "id": "lexus_rc_f_lmgt3", "name": "Lexus RC F LMGT3" },
+    { "id": "mclaren_720s_lmgt3_evo", "name": "McLaren 720S LMGT3 Evo" },
+    { "id": "mercedes_amg_lmgt3", "name": "Mercedes-AMG GT3 Evo (LMGT3)" },
+    { "id": "porsche_911_lmgt3_r_992", "name": "Porsche 911 LMGT3 R (992)" }
+  ]
+}

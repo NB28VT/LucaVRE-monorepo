@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe "HandlingDeficits API", type: :request do
-  describe "GET /working_sessions/:working_session_id/handling_deficits" do
+  describe "GET /api/v1/working_sessions/:working_session_id/handling_deficits" do
     it "returns all handling deficits for the working session serialized with camelCase keys" do
       working_session = create(:working_session)
       handling_deficits = create_list(:handling_deficit, 2, working_session: working_session)
 
-      get "/working_sessions/#{working_session.id}/handling_deficits"
+      get "/api/v1/working_sessions/#{working_session.id}/handling_deficits"
 
       expect(response).to have_http_status(:ok)
 
@@ -19,7 +19,7 @@ RSpec.describe "HandlingDeficits API", type: :request do
     it "returns an empty array when the working session has no handling deficits" do
       working_session = create(:working_session)
 
-      get "/working_sessions/#{working_session.id}/handling_deficits"
+      get "/api/v1/working_sessions/#{working_session.id}/handling_deficits"
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)).to eq([])
@@ -30,25 +30,25 @@ RSpec.describe "HandlingDeficits API", type: :request do
       other_working_session = create(:working_session)
       create(:handling_deficit, working_session: other_working_session)
 
-      get "/working_sessions/#{working_session.id}/handling_deficits"
+      get "/api/v1/working_sessions/#{working_session.id}/handling_deficits"
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)).to eq([])
     end
 
     it "returns a 404 when the working session does not exist" do
-      get "/working_sessions/does-not-exist/handling_deficits"
+      get "/api/v1/working_sessions/does-not-exist/handling_deficits"
 
       expect(response).to have_http_status(:not_found)
       expect(JSON.parse(response.body)).to eq({ "errors" => ["Working session not found"] })
     end
   end
 
-  describe "GET /handling_deficits/:id" do
+  describe "GET /api/v1/handling_deficits/:id" do
     it "returns the requested handling deficit" do
       handling_deficit = create(:handling_deficit)
 
-      get "/handling_deficits/#{handling_deficit.id}"
+      get "/api/v1/handling_deficits/#{handling_deficit.id}"
 
       expect(response).to have_http_status(:ok)
 
@@ -60,19 +60,19 @@ RSpec.describe "HandlingDeficits API", type: :request do
     end
 
     it "returns a 404 when the handling deficit does not exist" do
-      get "/handling_deficits/does-not-exist"
+      get "/api/v1/handling_deficits/does-not-exist"
 
       expect(response).to have_http_status(:not_found)
       expect(JSON.parse(response.body)).to eq({ "errors" => ["Handling deficit not found"] })
     end
   end
 
-  describe "POST /working_sessions/:working_session_id/handling_deficits" do
+  describe "POST /api/v1/working_sessions/:working_session_id/handling_deficits" do
     it "creates a handling deficit for the given working session" do
       working_session = create(:working_session)
 
       expect {
-        post "/working_sessions/#{working_session.id}/handling_deficits",
+        post "/api/v1/working_sessions/#{working_session.id}/handling_deficits",
              params: { handling_deficit: { location: "trackwide", deficit: "oversteer" } }
       }.to change(HandlingDeficit, :count).by(1)
 
@@ -87,7 +87,7 @@ RSpec.describe "HandlingDeficits API", type: :request do
     it "ignores unpermitted params via strong params" do
       working_session = create(:working_session)
 
-      post "/working_sessions/#{working_session.id}/handling_deficits",
+      post "/api/v1/working_sessions/#{working_session.id}/handling_deficits",
            params: { handling_deficit: { location: "trackwide", deficit: "oversteer", id: 999 } }
 
       expect(response).to have_http_status(:created)
@@ -98,7 +98,7 @@ RSpec.describe "HandlingDeficits API", type: :request do
       working_session = create(:working_session)
 
       expect {
-        post "/working_sessions/#{working_session.id}/handling_deficits",
+        post "/api/v1/working_sessions/#{working_session.id}/handling_deficits",
              params: { handling_deficit: { location: "front", deficit: "wobbly" } }
       }.not_to change(HandlingDeficit, :count)
 
@@ -107,18 +107,18 @@ RSpec.describe "HandlingDeficits API", type: :request do
     end
 
     it "returns a 404 when the working session does not exist" do
-      post "/working_sessions/does-not-exist/handling_deficits",
+      post "/api/v1/working_sessions/does-not-exist/handling_deficits",
            params: { handling_deficit: { location: "trackwide", deficit: "oversteer" } }
 
       expect(response).to have_http_status(:not_found)
     end
   end
 
-  describe "PATCH /handling_deficits/:id" do
+  describe "PATCH /api/v1/handling_deficits/:id" do
     it "updates the location and deficit" do
       handling_deficit = create(:handling_deficit, location: "trackwide", deficit: "oversteer")
 
-      patch "/handling_deficits/#{handling_deficit.id}",
+      patch "/api/v1/handling_deficits/#{handling_deficit.id}",
             params: { handling_deficit: { deficit: "understeer" } }
 
       expect(response).to have_http_status(:ok)
@@ -131,7 +131,7 @@ RSpec.describe "HandlingDeficits API", type: :request do
     it "returns unprocessable_content when the update is invalid" do
       handling_deficit = create(:handling_deficit)
 
-      patch "/handling_deficits/#{handling_deficit.id}",
+      patch "/api/v1/handling_deficits/#{handling_deficit.id}",
             params: { handling_deficit: { deficit: "wobbly" } }
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -139,18 +139,18 @@ RSpec.describe "HandlingDeficits API", type: :request do
     end
 
     it "returns a 404 when the handling deficit does not exist" do
-      patch "/handling_deficits/does-not-exist", params: { handling_deficit: { deficit: "understeer" } }
+      patch "/api/v1/handling_deficits/does-not-exist", params: { handling_deficit: { deficit: "understeer" } }
 
       expect(response).to have_http_status(:not_found)
     end
   end
 
-  describe "DELETE /handling_deficits/:id" do
+  describe "DELETE /api/v1/handling_deficits/:id" do
     it "deletes the handling deficit" do
       handling_deficit = create(:handling_deficit)
 
       expect {
-        delete "/handling_deficits/#{handling_deficit.id}"
+        delete "/api/v1/handling_deficits/#{handling_deficit.id}"
       }.to change(HandlingDeficit, :count).by(-1)
 
       expect(response).to have_http_status(:no_content)
@@ -158,7 +158,7 @@ RSpec.describe "HandlingDeficits API", type: :request do
     end
 
     it "returns a 404 when the handling deficit does not exist" do
-      delete "/handling_deficits/does-not-exist"
+      delete "/api/v1/handling_deficits/does-not-exist"
 
       expect(response).to have_http_status(:not_found)
     end

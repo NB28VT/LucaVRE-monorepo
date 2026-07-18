@@ -1,0 +1,33 @@
+{
+  "tracks": [
+    { "id": "algarve_grand_prix", "name": "Algarve (Portimão) - Grand Prix", "parent_circuit": "Algarve International Circuit" },
+    { "id": "algarve_elms", "name": "Algarve (Portimão) - ELMS Layout", "parent_circuit": "Algarve International Circuit" },
+    { "id": "bahrain_grand_prix", "name": "Bahrain - Grand Prix Circuit", "parent_circuit": "Bahrain International Circuit" },
+    { "id": "bahrain_endurance", "name": "Bahrain - Endurance Circuit", "parent_circuit": "Bahrain International Circuit" },
+    { "id": "bahrain_outer", "name": "Bahrain - Outer Circuit", "parent_circuit": "Bahrain International Circuit" },
+    { "id": "bahrain_paddock", "name": "Bahrain - Paddock Circuit", "parent_circuit": "Bahrain International Circuit" },
+    { "id": "barcelona_catalunya_gp", "name": "Barcelona-Catalunya - Grand Prix", "parent_circuit": "Circuit de Barcelona-Catalunya" },
+    { "id": "barcelona_catalunya_national", "name": "Barcelona-Catalunya - National", "parent_circuit": "Circuit de Barcelona-Catalunya" },
+    { "id": "cota_grand_prix", "name": "COTA - Grand Prix", "parent_circuit": "Circuit of the Americas" },
+    { "id": "cota_national", "name": "COTA - National Layout", "parent_circuit": "Circuit of the Americas" },
+    { "id": "fuji_grand_prix", "name": "Fuji Speedway - Grand Prix", "parent_circuit": "Fuji Speedway" },
+    { "id": "fuji_classic", "name": "Fuji Speedway - Classic (No Chicane)", "parent_circuit": "Fuji Speedway" },
+    { "id": "imola_grand_prix", "name": "Imola - Grand Prix", "parent_circuit": "Autodromo Enzo e Dino Ferrari" },
+    { "id": "imola_elms", "name": "Imola - ELMS Layout", "parent_circuit": "Autodromo Enzo e Dino Ferrari" },
+    { "id": "interlagos_grand_prix", "name": "Interlagos - Grand Prix", "parent_circuit": "Autódromo José Carlos Pace" },
+    { "id": "le_mans_24h_full", "name": "Le Mans - 24h Full Circuit", "parent_circuit": "Circuit de la Sarthe" },
+    { "id": "le_mans_mulsanne_no_chicanes", "name": "Le Mans - Mulsanne (No Chicanes)", "parent_circuit": "Circuit de la Sarthe" },
+    { "id": "lusail_grand_prix", "name": "Lusail - Grand Prix Circuit", "parent_circuit": "Lusail International Circuit" },
+    { "id": "lusail_short", "name": "Lusail - Short Circuit", "parent_circuit": "Lusail International Circuit" },
+    { "id": "monza_grand_prix", "name": "Monza - Grand Prix", "parent_circuit": "Autodromo Nazionale di Monza" },
+    { "id": "monza_curva_grande", "name": "Monza - Curva Grande Layout", "parent_circuit": "Autodromo Nazionale di Monza" },
+    { "id": "paul_ricard_grand_prix", "name": "Paul Ricard - Grand Prix", "parent_circuit": "Circuit Paul Ricard" },
+    { "id": "paul_ricard_1av2", "name": "Paul Ricard - 1av2 Layout", "parent_circuit": "Circuit Paul Ricard" },
+    { "id": "sebring_12h_full", "name": "Sebring - 12h Full Circuit", "parent_circuit": "Sebring International Raceway" },
+    { "id": "sebring_school", "name": "Sebring - School Circuit", "parent_circuit": "Sebring International Raceway" },
+    { "id": "silverstone_grand_prix", "name": "Silverstone - Grand Prix (WEC)", "parent_circuit": "Silverstone Circuit" },
+    { "id": "silverstone_national", "name": "Silverstone - National Layout", "parent_circuit": "Silverstone Circuit" },
+    { "id": "spa_francorchamps_gp", "name": "Spa-Francorchamps - Grand Prix", "parent_circuit": "Circuit de Spa-Francorchamps" },
+    { "id": "spa_endurance_62_car", "name": "Spa-Francorchamps - Endurance (62-Car)", "parent_circuit": "Circuit de Spa-Francorchamps" }
+  ]
+}

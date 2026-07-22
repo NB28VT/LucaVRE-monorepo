@@ -1,4 +1,5 @@
-import { MOCK_CARS, MOCK_TRACKS } from '@/data/mockVehicleData.ts';
+import { useCars } from '@/hooks/useCars.ts';
+import { useTracks } from '@/hooks/useTracks.ts';
 
 interface NewSessionPageProps {
   selectedCarId: string;
@@ -17,6 +18,9 @@ function NewSessionPage({
   onBack,
   onNext,
 }: NewSessionPageProps) {
+  const { data: cars, isLoading: carsLoading, isError: carsError } = useCars();
+  const { data: tracks, isLoading: tracksLoading, isError: tracksError } = useTracks();
+
   return (
     <section className="view view-new" aria-label="New Session">
       <button type="button" className="back-button" onClick={onBack}>
@@ -37,14 +41,17 @@ function NewSessionPage({
             className="detail-select"
             value={selectedCarId}
             onChange={(event) => onSelectCarId(event.target.value)}
+            disabled={carsLoading}
           >
             <option value="">Select a GT3 car&hellip;</option>
-            {MOCK_CARS.map((car) => (
+            {cars?.map((car) => (
               <option key={car.id} value={car.id}>
                 {car.name}
               </option>
             ))}
           </select>
+          {carsLoading && <p className="detail-card-value">Loading cars&hellip;</p>}
+          {carsError && <p className="detail-card-value">Failed to load cars.</p>}
         </div>
 
         <div className="detail-card">
@@ -56,14 +63,17 @@ function NewSessionPage({
             className="detail-select"
             value={selectedTrackId}
             onChange={(event) => onSelectTrackId(event.target.value)}
+            disabled={tracksLoading}
           >
             <option value="">Select a track&hellip;</option>
-            {MOCK_TRACKS.map((track) => (
+            {tracks?.map((track) => (
               <option key={track.id} value={track.id}>
                 {track.name}
               </option>
             ))}
           </select>
+          {tracksLoading && <p className="detail-card-value">Loading tracks&hellip;</p>}
+          {tracksError && <p className="detail-card-value">Failed to load tracks.</p>}
         </div>
       </div>
 

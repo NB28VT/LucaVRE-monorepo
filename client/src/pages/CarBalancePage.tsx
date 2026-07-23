@@ -2,8 +2,8 @@ import { MOCK_REPORTED_SYMPTOMS } from '@/data/mockVehicleData.ts';
 import SessionHeader from '@/components/SessionHeader.tsx';
 
 interface CarBalancePageProps {
-  selectedCarId: string;
-  selectedTrackId: string;
+  carName: string;
+  trackName: string;
   selectedSymptomId: string;
   onSelectSymptomId: (symptomId: string) => void;
   onBack: () => void;
@@ -11,8 +11,8 @@ interface CarBalancePageProps {
 }
 
 function CarBalancePage({
-  selectedCarId,
-  selectedTrackId,
+  carName,
+  trackName,
   selectedSymptomId,
   onSelectSymptomId,
   onBack,
@@ -24,7 +24,7 @@ function CarBalancePage({
         <span aria-hidden="true">&#8592;</span> Back
       </button>
 
-      <SessionHeader selectedCarId={selectedCarId} selectedTrackId={selectedTrackId} />
+      <SessionHeader carName={carName} trackName={trackName} />
 
       <header className="view-header">
         <h2 className="view-title">Car Balance</h2>

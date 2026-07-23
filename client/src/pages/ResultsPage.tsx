@@ -2,15 +2,15 @@ import { MOCK_SUGGESTED_SETUP_CHANGES } from '@/data/mockVehicleData.ts';
 import SessionHeader from '@/components/SessionHeader.tsx';
 
 interface ResultsPageProps {
-  selectedCarId: string;
-  selectedTrackId: string;
+  carName: string;
+  trackName: string;
   onBack: () => void;
   onWorkOnAnotherSession: () => void;
 }
 
 function ResultsPage({
-  selectedCarId,
-  selectedTrackId,
+  carName,
+  trackName,
   onBack,
   onWorkOnAnotherSession,
 }: ResultsPageProps) {
@@ -20,7 +20,7 @@ function ResultsPage({
         <span aria-hidden="true">&#8592;</span> Back
       </button>
 
-      <SessionHeader selectedCarId={selectedCarId} selectedTrackId={selectedTrackId} />
+      <SessionHeader carName={carName} trackName={trackName} />
 
       <div className="suggestions-card">
         <div className="suggestions-card-header">

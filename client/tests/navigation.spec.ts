@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { mockCreateWorkingSessionSuccess } from './helpers/workingSessionApi';
+import { mockVehicleOptions } from './helpers/vehicleOptionsApi';
 
 test.describe('Page navigation', () => {
   test.beforeEach(async ({ page }) => {
+    await mockVehicleOptions(page);
+
     await page.goto('http://localhost:5173');
   });
 
@@ -36,12 +40,12 @@ test.describe('Page navigation', () => {
     await expect(page.getByRole('region', { name: 'Load Session' })).not.toBeVisible();
   });
 
-  test('shows a Next button (not Submit) on the New Session page', async ({ page }) => {
+  test('shows a Submit button (not Next) on the New Session page', async ({ page }) => {
     await page.getByRole('button', { name: 'New Session' }).click();
     await expect(page.getByRole('region', { name: 'New Session' })).toBeVisible();
 
-    await expect(page.getByRole('button', { name: 'Next' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Submit', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next' })).not.toBeVisible();
   });
 
   test('does not show the car balance dropdown on the New Session page', async ({ page }) => {
@@ -51,9 +55,13 @@ test.describe('Page navigation', () => {
     await expect(page.getByLabel('Reported Symptom')).not.toBeVisible();
   });
 
-  test('navigates from New Session to Car Balance via Next', async ({ page }) => {
+  test('navigates from New Session to Car Balance via Submit', async ({ page }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
+    await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
+    await page.getByRole('button', { name: 'Submit' }).click();
 
     await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'New Session' })).not.toBeVisible();
@@ -62,8 +70,12 @@ test.describe('Page navigation', () => {
   });
 
   test('navigates from Car Balance back to New Session', async ({ page }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
+    await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
+    await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Back' }).click();
@@ -73,8 +85,13 @@ test.describe('Page navigation', () => {
   });
 
   test('navigates from Car Balance to Suggested Setup Changes via Submit', async ({ page }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
+    await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
     await page.getByRole('button', { name: 'Submit' }).click();
 
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
@@ -82,8 +99,13 @@ test.describe('Page navigation', () => {
   });
 
   test('navigates from Suggested Setup Changes back to Car Balance', async ({ page }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
+    await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
 
@@ -96,12 +118,14 @@ test.describe('Page navigation', () => {
   test('preserves selected car, track, and car balance across the full round trip', async ({
     page,
   }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
 
     await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
 
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
 
     await page.getByLabel('Reported Symptom').selectOption({ label: 'Oversteer' });
@@ -122,12 +146,14 @@ test.describe('Page navigation', () => {
   test('shows the session header with the selected car and track on the Car Balance page', async ({
     page,
   }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
 
     await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
 
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
 
     const sessionHeader = page.getByRole('group', { name: 'Active session' });
     await expect(sessionHeader).toBeVisible();
@@ -139,12 +165,15 @@ test.describe('Page navigation', () => {
   test('shows the session header with the selected car and track on the Suggested Setup Changes page', async ({
     page,
   }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
 
     await page.getByLabel('Car').selectOption({ label: 'Ferrari 296 GT3' });
     await page.getByLabel('Track').selectOption({ label: 'Circuit de la Sarthe (Le Mans)' });
 
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
     await page.getByLabel('Reported Symptom').selectOption({ label: 'Understeer' });
     await page.getByRole('button', { name: 'Submit' }).click();
 
@@ -158,8 +187,13 @@ test.describe('Page navigation', () => {
   test('navigates from Suggested Setup Changes all the way back to Start Session via Work on Another Session', async ({
     page,
   }) => {
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.getByRole('button', { name: 'New Session' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
+    await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
 

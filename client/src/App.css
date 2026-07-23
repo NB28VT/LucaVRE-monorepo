@@ -9,6 +9,7 @@
   --color-accent-hover: #ff8558;
   --color-accent-text: #1a0d05;
   --color-accent-cyan: #2dd4ff;
+  --color-danger: #ff5c6c;
   --radius-md: 12px;
   --radius-lg: 18px;
   --spacing-xs: 0.5rem;
@@ -299,6 +300,14 @@ button {
   margin: 0;
   font-size: 0.95rem;
   color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.detail-card-error {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-danger);
   line-height: 1.4;
 }
 

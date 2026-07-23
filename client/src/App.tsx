@@ -10,8 +10,20 @@ import './App.css';
 function App() {
   const [currentView, setCurrentView] = useState<CurrentView>('start');
   const [selectedCarId, setSelectedCarId] = useState<string>('');
+  const [selectedCarName, setSelectedCarName] = useState<string>('');
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
+  const [selectedTrackName, setSelectedTrackName] = useState<string>('');
   const [selectedSymptomId, setSelectedSymptomId] = useState<string>('');
+
+  function handleSelectCarId(carId: string, carName: string): void {
+    setSelectedCarId(carId);
+    setSelectedCarName(carName);
+  }
+
+  function handleSelectTrackId(trackId: string, trackName: string): void {
+    setSelectedTrackId(trackId);
+    setSelectedTrackName(trackName);
+  }
 
   function handleStartNewSession(): void {
     setCurrentView('new');
@@ -26,8 +38,9 @@ function App() {
   }
 
   function handleResumeSession(session: SavedSession): void {
-    setCurrentView('new');
-    void session;
+    setSelectedCarName(session.carName);
+    setSelectedTrackName(session.trackName);
+    setCurrentView('balance');
   }
 
   function handleGoToCarBalance(): void {
@@ -48,7 +61,9 @@ function App() {
 
   function handleWorkOnAnotherSession(): void {
     setSelectedCarId('');
+    setSelectedCarName('');
     setSelectedTrackId('');
+    setSelectedTrackName('');
     setSelectedSymptomId('');
     setCurrentView('start');
   }
@@ -71,8 +86,8 @@ function App() {
           <NewSessionPage
             selectedCarId={selectedCarId}
             selectedTrackId={selectedTrackId}
-            onSelectCarId={setSelectedCarId}
-            onSelectTrackId={setSelectedTrackId}
+            onSelectCarId={handleSelectCarId}
+            onSelectTrackId={handleSelectTrackId}
             onBack={handleReturnToStart}
             onNext={handleGoToCarBalance}
           />
@@ -80,8 +95,8 @@ function App() {
       case 'balance':
         return (
           <CarBalancePage
-            selectedCarId={selectedCarId}
-            selectedTrackId={selectedTrackId}
+            carName={selectedCarName}
+            trackName={selectedTrackName}
             selectedSymptomId={selectedSymptomId}
             onSelectSymptomId={setSelectedSymptomId}
             onBack={handleReturnToCarTrack}
@@ -91,8 +106,8 @@ function App() {
       case 'results':
         return (
           <ResultsPage
-            selectedCarId={selectedCarId}
-            selectedTrackId={selectedTrackId}
+            carName={selectedCarName}
+            trackName={selectedTrackName}
             onBack={handleReturnToSession}
             onWorkOnAnotherSession={handleWorkOnAnotherSession}
           />

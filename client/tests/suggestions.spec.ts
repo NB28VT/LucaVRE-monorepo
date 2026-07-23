@@ -1,11 +1,18 @@
 import { test, expect } from '@playwright/test';
+import { mockCreateWorkingSessionSuccess } from './helpers/workingSessionApi';
+import { mockVehicleOptions } from './helpers/vehicleOptionsApi';
 
 test.describe('Setup diagnosis submission', () => {
   test.beforeEach(async ({ page }) => {
+    await mockVehicleOptions(page);
+    await mockCreateWorkingSessionSuccess(page);
+
     await page.goto('http://localhost:5173');
     await page.getByRole('button', { name: 'New Session' }).click();
     await expect(page.getByRole('region', { name: 'New Session' })).toBeVisible();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
+    await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
+    await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
   });
 
@@ -60,7 +67,7 @@ test.describe('Setup diagnosis submission', () => {
     await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
 
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
 
     await page.getByLabel('Reported Symptom').selectOption({ label: 'Oversteer' });
@@ -108,7 +115,8 @@ test.describe('Setup diagnosis submission', () => {
     await page.getByLabel('Car').selectOption({ label: 'Porsche 911 GT3 R' });
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
 
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
     await page.getByLabel('Reported Symptom').selectOption({ label: 'Oversteer' });
 
     await page.getByRole('button', { name: 'Submit' }).click();
@@ -122,7 +130,7 @@ test.describe('Setup diagnosis submission', () => {
     await expect(page.getByLabel('Car')).toHaveValue('');
     await expect(page.getByLabel('Track')).toHaveValue('');
 
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByLabel('Reported Symptom')).toHaveValue('');
   });
 });

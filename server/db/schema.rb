@@ -10,17 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_11_170100) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "handling_deficits", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "deficit", null: false
     t.string "location", null: false
+    t.string "phase"
+    t.string "symptom", null: false
     t.datetime "updated_at", null: false
     t.bigint "working_session_id", null: false
-    t.index ["working_session_id"], name: "index_handling_deficits_on_working_session_id"
+    t.index ["working_session_id", "location", "phase"], name: "index_handling_deficits_on_session_location_phase", unique: true
+    t.index ["working_session_id", "location"], name: "index_handling_deficits_on_session_location_null_phase", unique: true, where: "(phase IS NULL)"
   end
 
   create_table "working_sessions", force: :cascade do |t|

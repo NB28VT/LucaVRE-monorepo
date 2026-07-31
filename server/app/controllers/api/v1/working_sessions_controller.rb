@@ -18,7 +18,7 @@ module Api
         if working_session.save
           render json: WorkingSessionSerializer.new(working_session).serialize, status: :created
         else
-          render json: { errors: working_session.errors.full_messages }, status: :unprocessable_content
+          render json: { errors: working_session.errors.as_json }, status: :unprocessable_entity
         end
       end
 

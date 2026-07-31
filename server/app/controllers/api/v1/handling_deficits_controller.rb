@@ -51,7 +51,7 @@ module Api
       end
 
       def handling_deficit_params
-        params.require(:handling_deficit).permit(:location, :deficit)
+        params.require(:handling_deficit).permit(:location, :symptom, :phase)
       end
     end
   end

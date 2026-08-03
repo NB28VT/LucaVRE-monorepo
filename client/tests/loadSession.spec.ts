@@ -6,7 +6,7 @@ test.describe('Load Session resume flow', () => {
     await page.goto('http://localhost:5173');
   });
 
-  test('resuming a saved session navigates to the Car Balance page', async ({ page }) => {
+  test('resuming a saved session navigates to the Current Session page', async ({ page }) => {
     await mockWorkingSessionsList(page, [
       {
         id: 1,
@@ -23,7 +23,7 @@ test.describe('Load Session resume flow', () => {
 
     await page.getByRole('button', { name: 'Resume' }).click();
 
-    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Load Session' })).not.toBeVisible();
   });
 

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import type { CurrentView, SavedSession } from '@/types/session.ts';
+import type { HandlingCharacteristic } from '@/types/handlingCharacteristic.ts';
 import StartPage from '@/pages/StartPage.tsx';
 import LoadSessionPage from '@/pages/LoadSessionPage.tsx';
 import NewSessionPage from '@/pages/NewSessionPage.tsx';
-import CarBalancePage from '@/pages/CarBalancePage.tsx';
+import CurrentSessionPage from '@/pages/CurrentSessionPage.tsx';
 import ResultsPage from '@/pages/ResultsPage.tsx';
 import './App.css';
 
@@ -13,7 +14,9 @@ function App() {
   const [selectedCarName, setSelectedCarName] = useState<string>('');
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
   const [selectedTrackName, setSelectedTrackName] = useState<string>('');
-  const [selectedSymptomId, setSelectedSymptomId] = useState<string>('');
+  const [handlingCharacteristics, setHandlingCharacteristics] = useState<
+    HandlingCharacteristic[]
+  >([]);
 
   function handleSelectCarId(carId: string, carName: string): void {
     setSelectedCarId(carId);
@@ -40,11 +43,11 @@ function App() {
   function handleResumeSession(session: SavedSession): void {
     setSelectedCarName(session.carName);
     setSelectedTrackName(session.trackName);
-    setCurrentView('balance');
+    setCurrentView('session');
   }
 
-  function handleGoToCarBalance(): void {
-    setCurrentView('balance');
+  function handleGoToCurrentSession(): void {
+    setCurrentView('session');
   }
 
   function handleReturnToCarTrack(): void {
@@ -56,7 +59,7 @@ function App() {
   }
 
   function handleReturnToSession(): void {
-    setCurrentView('balance');
+    setCurrentView('session');
   }
 
   function handleWorkOnAnotherSession(): void {
@@ -64,8 +67,34 @@ function App() {
     setSelectedCarName('');
     setSelectedTrackId('');
     setSelectedTrackName('');
-    setSelectedSymptomId('');
+    setHandlingCharacteristics([]);
     setCurrentView('start');
+  }
+
+  function handleAddHandlingCharacteristic(
+    characteristic: Omit<HandlingCharacteristic, 'id'>,
+  ): void {
+    setHandlingCharacteristics((characteristics) => [
+      ...characteristics,
+      { id: crypto.randomUUID(), ...characteristic },
+    ]);
+  }
+
+  function handleUpdateHandlingCharacteristic(
+    id: string,
+    updates: Omit<HandlingCharacteristic, 'id'>,
+  ): void {
+    setHandlingCharacteristics((characteristics) =>
+      characteristics.map((characteristic) =>
+        characteristic.id === id ? { id, ...updates } : characteristic,
+      ),
+    );
+  }
+
+  function handleDeleteHandlingCharacteristic(id: string): void {
+    setHandlingCharacteristics((characteristics) =>
+      characteristics.filter((characteristic) => characteristic.id !== id),
+    );
   }
 
   function renderCurrentView() {
@@ -79,7 +108,12 @@ function App() {
         );
       case 'load':
         return (
-          <LoadSessionPage onBack={handleReturnToStart} onResumeSession={handleResumeSession} />
+          <LoadSessionPage
+            onBack={handleReturnToStart}
+            onNewSession={handleStartNewSession}
+            onGoHome={handleReturnToStart}
+            onResumeSession={handleResumeSession}
+          />
         );
       case 'new':
         return (
@@ -89,17 +123,23 @@ function App() {
             onSelectCarId={handleSelectCarId}
             onSelectTrackId={handleSelectTrackId}
             onBack={handleReturnToStart}
-            onNext={handleGoToCarBalance}
+            onNewSession={handleStartNewSession}
+            onGoHome={handleReturnToStart}
+            onNext={handleGoToCurrentSession}
           />
         );
-      case 'balance':
+      case 'session':
         return (
-          <CarBalancePage
+          <CurrentSessionPage
             carName={selectedCarName}
             trackName={selectedTrackName}
-            selectedSymptomId={selectedSymptomId}
-            onSelectSymptomId={setSelectedSymptomId}
+            handlingCharacteristics={handlingCharacteristics}
+            onAddHandlingCharacteristic={handleAddHandlingCharacteristic}
+            onUpdateHandlingCharacteristic={handleUpdateHandlingCharacteristic}
+            onDeleteHandlingCharacteristic={handleDeleteHandlingCharacteristic}
             onBack={handleReturnToCarTrack}
+            onNewSession={handleStartNewSession}
+            onGoHome={handleReturnToStart}
             onSubmit={handleSubmitDiagnosis}
           />
         );
@@ -109,6 +149,8 @@ function App() {
             carName={selectedCarName}
             trackName={selectedTrackName}
             onBack={handleReturnToSession}
+            onNewSession={handleStartNewSession}
+            onGoHome={handleReturnToStart}
             onWorkOnAnotherSession={handleWorkOnAnotherSession}
           />
         );

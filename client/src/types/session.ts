@@ -1,4 +1,4 @@
-export type CurrentView = 'start' | 'load' | 'new' | 'balance' | 'results';
+export type CurrentView = 'start' | 'load' | 'new' | 'session' | 'results';
 
 export interface SavedSession {
   id: string;

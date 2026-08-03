@@ -1,15 +1,22 @@
 interface SessionHeaderProps {
   carName: string;
   trackName: string;
+  statusLabel?: string;
 }
 
-function SessionHeader({ carName, trackName }: SessionHeaderProps) {
+function SessionHeader({
+  carName,
+  trackName,
+  statusLabel = 'Session Active',
+}: SessionHeaderProps) {
   return (
     <div className="hub-readout" role="group" aria-label="Active session">
-      <p className="hub-readout-status">
-        <span className="hub-readout-dot" aria-hidden="true" />
-        Session Active
-      </p>
+      <div className="hub-readout-top">
+        <p className="hub-readout-status">
+          <span className="hub-readout-dot" aria-hidden="true" />
+          {statusLabel}
+        </p>
+      </div>
 
       <div className="hub-readout-combo">
         <div className="hub-readout-item">

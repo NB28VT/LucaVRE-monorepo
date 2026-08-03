@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { isAxiosError } from 'axios';
+import ViewTopBar from '@/components/ViewTopBar.tsx';
 import { useCars } from '@/hooks/useCars.ts';
 import { useTracks } from '@/hooks/useTracks.ts';
 import { useCreateWorkingSession } from '@/hooks/useCreateWorkingSession.ts';
@@ -11,6 +12,8 @@ interface NewSessionPageProps {
   onSelectCarId: (carId: string, carName: string) => void;
   onSelectTrackId: (trackId: string, trackName: string) => void;
   onBack: () => void;
+  onNewSession: () => void;
+  onGoHome: () => void;
   onNext: () => void;
 }
 
@@ -20,6 +23,8 @@ function NewSessionPage({
   onSelectCarId,
   onSelectTrackId,
   onBack,
+  onNewSession,
+  onGoHome,
   onNext,
 }: NewSessionPageProps) {
   const { data: cars, isLoading: carsLoading, isError: carsError } = useCars();
@@ -66,9 +71,7 @@ function NewSessionPage({
 
   return (
     <section className="view view-new" aria-label="New Session">
-      <button type="button" className="back-button" onClick={onBack}>
-        <span aria-hidden="true">&#8592;</span> Back
-      </button>
+      <ViewTopBar onBack={onBack} onNewSession={onNewSession} onGoHome={onGoHome} />
 
       <header className="view-header">
         <h2 className="view-title">New Session</h2>

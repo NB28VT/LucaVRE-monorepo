@@ -1,9 +1,12 @@
+import ViewTopBar from '@/components/ViewTopBar.tsx';
 import { useWorkingSessions } from '@/hooks/useWorkingSessions.ts';
 import type { WorkingSession } from '@/types/workingSession.ts';
 import type { SavedSession } from '@/types/session.ts';
 
 interface LoadSessionPageProps {
   onBack: () => void;
+  onNewSession: () => void;
+  onGoHome: () => void;
   onResumeSession: (session: SavedSession) => void;
 }
 
@@ -16,14 +19,12 @@ function toSavedSession(session: WorkingSession): SavedSession {
   };
 }
 
-function LoadSessionPage({ onBack, onResumeSession }: LoadSessionPageProps) {
+function LoadSessionPage({ onBack, onNewSession, onGoHome, onResumeSession }: LoadSessionPageProps) {
   const { data: workingSessions, isLoading, isError } = useWorkingSessions();
 
   return (
     <section className="view view-load" aria-label="Load Session">
-      <button type="button" className="back-button" onClick={onBack}>
-        <span aria-hidden="true">&#8592;</span> Back
-      </button>
+      <ViewTopBar onBack={onBack} onNewSession={onNewSession} onGoHome={onGoHome} />
 
       <header className="view-header">
         <h2 className="view-title">Load Session</h2>

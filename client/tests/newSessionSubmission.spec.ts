@@ -14,7 +14,7 @@ test.describe('New Session submission', () => {
     await expect(page.getByRole('region', { name: 'New Session' })).toBeVisible();
   });
 
-  test('navigates to Car Balance when submitting with a car and track selected succeeds', async ({
+  test('navigates to Current Session when submitting with a car and track selected succeeds', async ({
     page,
   }) => {
     await mockCreateWorkingSessionSuccess(page);
@@ -24,7 +24,7 @@ test.describe('New Session submission', () => {
 
     await page.getByRole('button', { name: 'Submit' }).click();
 
-    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'New Session' })).not.toBeVisible();
   });
 
@@ -131,6 +131,6 @@ test.describe('New Session submission', () => {
     await submitButton.click();
 
     await expect(submitButton).toBeDisabled();
-    await expect(page.getByRole('region', { name: 'Car Balance' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
   });
 });

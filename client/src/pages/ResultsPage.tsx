@@ -1,10 +1,13 @@
 import { MOCK_SUGGESTED_SETUP_CHANGES } from '@/data/mockVehicleData.ts';
 import SessionHeader from '@/components/SessionHeader.tsx';
+import ViewTopBar from '@/components/ViewTopBar.tsx';
 
 interface ResultsPageProps {
   carName: string;
   trackName: string;
   onBack: () => void;
+  onNewSession: () => void;
+  onGoHome: () => void;
   onWorkOnAnotherSession: () => void;
 }
 
@@ -12,13 +15,13 @@ function ResultsPage({
   carName,
   trackName,
   onBack,
+  onNewSession,
+  onGoHome,
   onWorkOnAnotherSession,
 }: ResultsPageProps) {
   return (
     <section className="view view-results" aria-label="Suggested Setup Changes">
-      <button type="button" className="back-button" onClick={onBack}>
-        <span aria-hidden="true">&#8592;</span> Back
-      </button>
+      <ViewTopBar onBack={onBack} onNewSession={onNewSession} onGoHome={onGoHome} />
 
       <SessionHeader carName={carName} trackName={trackName} />
 

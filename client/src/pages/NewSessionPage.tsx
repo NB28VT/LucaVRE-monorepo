@@ -4,7 +4,7 @@ import ViewTopBar from '@/components/ViewTopBar.tsx';
 import { useCars } from '@/hooks/useCars.ts';
 import { useTracks } from '@/hooks/useTracks.ts';
 import { useCreateWorkingSession } from '@/hooks/useCreateWorkingSession.ts';
-import type { WorkingSessionValidationErrors } from '@/types/workingSession.ts';
+import type { WorkingSession, WorkingSessionValidationErrors } from '@/types/workingSession.ts';
 
 interface NewSessionPageProps {
   selectedCarId: string;
@@ -14,7 +14,7 @@ interface NewSessionPageProps {
   onBack: () => void;
   onNewSession: () => void;
   onGoHome: () => void;
-  onNext: () => void;
+  onNext: (session: WorkingSession) => void;
 }
 
 function NewSessionPage({
@@ -53,7 +53,7 @@ function NewSessionPage({
     createWorkingSession(
       { carId: selectedCarId, trackId: selectedTrackId },
       {
-        onSuccess: onNext,
+        onSuccess: (session) => onNext(session),
         onError: (error) => {
           if (isAxiosError<{ errors?: WorkingSessionValidationErrors }>(error) && error.response?.status === 422) {
             const errors = error.response.data?.errors;

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { CurrentView, SavedSession } from '@/types/session.ts';
 import type { HandlingCharacteristic } from '@/types/handlingCharacteristic.ts';
+import type { WorkingSession } from '@/types/workingSession.ts';
 import StartPage from '@/pages/StartPage.tsx';
 import LoadSessionPage from '@/pages/LoadSessionPage.tsx';
 import NewSessionPage from '@/pages/NewSessionPage.tsx';
@@ -14,9 +15,11 @@ function App() {
   const [selectedCarName, setSelectedCarName] = useState<string>('');
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
   const [selectedTrackName, setSelectedTrackName] = useState<string>('');
+  const [workingSessionId, setWorkingSessionId] = useState<number | null>(null);
   const [handlingCharacteristics, setHandlingCharacteristics] = useState<
     HandlingCharacteristic[]
   >([]);
+  const seededSessionIdRef = useRef<number | null>(null);
 
   function handleSelectCarId(carId: string, carName: string): void {
     setSelectedCarId(carId);
@@ -41,12 +44,23 @@ function App() {
   }
 
   function handleResumeSession(session: SavedSession): void {
+    const sessionId = Number(session.id);
     setSelectedCarName(session.carName);
     setSelectedTrackName(session.trackName);
+    if (sessionId !== workingSessionId) {
+      setHandlingCharacteristics([]);
+      seededSessionIdRef.current = null;
+    }
+    setWorkingSessionId(sessionId);
     setCurrentView('session');
   }
 
-  function handleGoToCurrentSession(): void {
+  function handleGoToCurrentSession(session: WorkingSession): void {
+    if (session.id !== workingSessionId) {
+      setHandlingCharacteristics([]);
+      seededSessionIdRef.current = null;
+    }
+    setWorkingSessionId(session.id);
     setCurrentView('session');
   }
 
@@ -67,17 +81,27 @@ function App() {
     setSelectedCarName('');
     setSelectedTrackId('');
     setSelectedTrackName('');
+    setWorkingSessionId(null);
     setHandlingCharacteristics([]);
+    seededSessionIdRef.current = null;
     setCurrentView('start');
   }
 
-  function handleAddHandlingCharacteristic(
-    characteristic: Omit<HandlingCharacteristic, 'id'>,
+  function handleHandlingCharacteristicsLoaded(
+    characteristics: HandlingCharacteristic[],
   ): void {
-    setHandlingCharacteristics((characteristics) => [
-      ...characteristics,
-      { id: crypto.randomUUID(), ...characteristic },
-    ]);
+    if (workingSessionId == null) {
+      return;
+    }
+    if (seededSessionIdRef.current === workingSessionId) {
+      return;
+    }
+    seededSessionIdRef.current = workingSessionId;
+    setHandlingCharacteristics(characteristics);
+  }
+
+  function handleAddHandlingCharacteristic(characteristic: HandlingCharacteristic): void {
+    setHandlingCharacteristics((characteristics) => [...characteristics, characteristic]);
   }
 
   function handleUpdateHandlingCharacteristic(
@@ -133,7 +157,9 @@ function App() {
           <CurrentSessionPage
             carName={selectedCarName}
             trackName={selectedTrackName}
+            workingSessionId={workingSessionId}
             handlingCharacteristics={handlingCharacteristics}
+            onHandlingCharacteristicsLoaded={handleHandlingCharacteristicsLoaded}
             onAddHandlingCharacteristic={handleAddHandlingCharacteristic}
             onUpdateHandlingCharacteristic={handleUpdateHandlingCharacteristic}
             onDeleteHandlingCharacteristic={handleDeleteHandlingCharacteristic}

@@ -4,10 +4,12 @@ import {
   mockCreateWorkingSessionValidationError,
 } from './helpers/workingSessionApi';
 import { mockVehicleOptions } from './helpers/vehicleOptionsApi';
+import { mockHandlingDeficitsList } from './helpers/handlingDeficitsApi';
 
 test.describe('New Session submission', () => {
   test.beforeEach(async ({ page }) => {
     await mockVehicleOptions(page);
+    await mockHandlingDeficitsList(page, 1, []);
 
     await page.goto('http://localhost:5173');
     await page.getByRole('button', { name: 'New Session' }).click();

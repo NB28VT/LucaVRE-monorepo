@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mockWorkingSessionsList } from './helpers/workingSessionApi';
+import { mockHandlingDeficitsList } from './helpers/handlingDeficitsApi';
 
 test.describe('Load Session resume flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -17,6 +18,7 @@ test.describe('Load Session resume flow', () => {
         track: { id: 'spa_francorchamps_gp', name: 'Spa-Francorchamps - Grand Prix' },
       },
     ]);
+    await mockHandlingDeficitsList(page, 1, []);
 
     await page.getByRole('button', { name: 'Load Session' }).click();
     await expect(page.getByRole('region', { name: 'Load Session' })).toBeVisible();
@@ -38,6 +40,7 @@ test.describe('Load Session resume flow', () => {
         track: { id: 'spa_francorchamps_gp', name: 'Spa-Francorchamps - Grand Prix' },
       },
     ]);
+    await mockHandlingDeficitsList(page, 1, []);
 
     await page.getByRole('button', { name: 'Load Session' }).click();
     await page.getByRole('button', { name: 'Resume' }).click();
@@ -67,6 +70,7 @@ test.describe('Load Session resume flow', () => {
         track: { id: 'monza_grand_prix', name: 'Monza - Grand Prix' },
       },
     ]);
+    await mockHandlingDeficitsList(page, 2, []);
 
     await page.getByRole('button', { name: 'Load Session' }).click();
 

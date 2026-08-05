@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
 import SessionHeader from '@/components/SessionHeader.tsx';
 import ViewTopBar from '@/components/ViewTopBar.tsx';
 import HandlingCharacteristicModal from '@/components/HandlingCharacteristicModal.tsx';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal.tsx';
+import { useCreateHandlingDeficit } from '@/hooks/useCreateHandlingDeficit.ts';
+import { useUpdateHandlingDeficit } from '@/hooks/useUpdateHandlingDeficit.ts';
+import { useDeleteHandlingDeficit } from '@/hooks/useDeleteHandlingDeficit.ts';
+import { useHandlingDeficits } from '@/hooks/useHandlingDeficits.ts';
 import { LOCATION_LABELS, PHASE_LABELS, SYMPTOM_LABELS } from '@/types/handlingCharacteristic.ts';
 import type {
   HandlingCharacteristic,
@@ -14,8 +19,10 @@ import type {
 interface CurrentSessionPageProps {
   carName: string;
   trackName: string;
+  workingSessionId: number | null;
   handlingCharacteristics: HandlingCharacteristic[];
-  onAddHandlingCharacteristic: (characteristic: Omit<HandlingCharacteristic, 'id'>) => void;
+  onHandlingCharacteristicsLoaded: (characteristics: HandlingCharacteristic[]) => void;
+  onAddHandlingCharacteristic: (characteristic: HandlingCharacteristic) => void;
   onUpdateHandlingCharacteristic: (
     id: string,
     updates: Omit<HandlingCharacteristic, 'id'>,
@@ -61,7 +68,9 @@ function isDuplicateLocationPhase(
 function CurrentSessionPage({
   carName,
   trackName,
+  workingSessionId,
   handlingCharacteristics,
+  onHandlingCharacteristicsLoaded,
   onAddHandlingCharacteristic,
   onUpdateHandlingCharacteristic,
   onDeleteHandlingCharacteristic,
@@ -70,13 +79,35 @@ function CurrentSessionPage({
   onGoHome,
   onSubmit,
 }: CurrentSessionPageProps) {
+  const {
+    data: handlingDeficits,
+    isLoading: isLoadingDeficits,
+    isError: isDeficitsError,
+  } = useHandlingDeficits(workingSessionId);
+  const { mutate: createHandlingDeficit, isPending: isCreatingDeficit } =
+    useCreateHandlingDeficit();
+  const { mutate: updateHandlingDeficit, isPending: isUpdatingDeficit } =
+    useUpdateHandlingDeficit();
+  const { mutate: deleteHandlingDeficit, isPending: isDeletingDeficit } =
+    useDeleteHandlingDeficit();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCharacteristicId, setEditingCharacteristicId] = useState<string | null>(null);
   const [draftLocation, setDraftLocation] = useState<Location | ''>('');
   const [draftPhase, setDraftPhase] = useState<Phase | ''>('');
   const [draftSymptom, setDraftSymptom] = useState<Symptom | ''>('');
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [deletingCharacteristic, setDeletingCharacteristic] =
     useState<HandlingCharacteristic | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!handlingDeficits) {
+      return;
+    }
+
+    onHandlingCharacteristicsLoaded(handlingDeficits);
+  }, [handlingDeficits, onHandlingCharacteristicsLoaded]);
 
   const isPhaseRequired = draftLocation !== '' && draftLocation !== 'global';
   const hasCompleteDraftSelection =
@@ -95,6 +126,7 @@ function CurrentSessionPage({
     setDraftLocation('');
     setDraftPhase('');
     setDraftSymptom('');
+    setSaveError(null);
     setIsModalOpen(true);
   }
 
@@ -103,18 +135,31 @@ function CurrentSessionPage({
     setDraftLocation(characteristic.location);
     setDraftPhase(characteristic.phase ?? '');
     setDraftSymptom(characteristic.symptom);
+    setSaveError(null);
     setIsModalOpen(true);
   }
 
   function handleCloseModal(): void {
     setIsModalOpen(false);
+    setSaveError(null);
   }
 
   function handleDraftLocationChange(location: string): void {
+    setSaveError(null);
     setDraftLocation(location as Location | '');
     if (location === 'global') {
       setDraftPhase('');
     }
+  }
+
+  function handleDraftPhaseChange(phase: string): void {
+    setSaveError(null);
+    setDraftPhase(phase as Phase | '');
+  }
+
+  function handleDraftSymptomChange(symptom: string): void {
+    setSaveError(null);
+    setDraftSymptom(symptom as Symptom | '');
   }
 
   function handleSaveModal(): void {
@@ -135,29 +180,101 @@ function CurrentSessionPage({
     }
 
     if (editingCharacteristicId) {
-      onUpdateHandlingCharacteristic(editingCharacteristicId, { location, phase, symptom });
-    } else {
-      onAddHandlingCharacteristic({ location, phase, symptom });
+      if (workingSessionId == null) {
+        return;
+      }
+
+      setSaveError(null);
+      updateHandlingDeficit(
+        { id: editingCharacteristicId, workingSessionId, location, phase, symptom },
+        {
+          onSuccess: (characteristic) => {
+            onUpdateHandlingCharacteristic(characteristic.id, {
+              location: characteristic.location,
+              phase: characteristic.phase,
+              symptom: characteristic.symptom,
+            });
+            setIsModalOpen(false);
+            setSaveError(null);
+          },
+          onError: (error) => {
+            if (
+              isAxiosError<{ errors?: string[] }>(error) &&
+              Array.isArray(error.response?.data?.errors)
+            ) {
+              setSaveError(error.response.data.errors.join(' '));
+              return;
+            }
+
+            setSaveError('Failed to save handling characteristic.');
+          },
+        },
+      );
+      return;
     }
 
-    setIsModalOpen(false);
+    if (workingSessionId == null) {
+      return;
+    }
+
+    setSaveError(null);
+    createHandlingDeficit(
+      { workingSessionId, location, phase, symptom },
+      {
+        onSuccess: (characteristic) => {
+          onAddHandlingCharacteristic(characteristic);
+          setIsModalOpen(false);
+          setSaveError(null);
+        },
+        onError: (error) => {
+          if (isAxiosError<{ errors?: string[] }>(error) && Array.isArray(error.response?.data?.errors)) {
+            setSaveError(error.response.data.errors.join(' '));
+            return;
+          }
+
+          setSaveError('Failed to save handling characteristic.');
+        },
+      },
+    );
   }
 
   function handleOpenDeleteConfirm(characteristic: HandlingCharacteristic): void {
+    setDeleteError(null);
     setDeletingCharacteristic(characteristic);
   }
 
   function handleCancelDelete(): void {
     setDeletingCharacteristic(null);
+    setDeleteError(null);
   }
 
   function handleConfirmDelete(): void {
-    if (!deletingCharacteristic) {
+    if (!deletingCharacteristic || workingSessionId == null) {
       return;
     }
 
-    onDeleteHandlingCharacteristic(deletingCharacteristic.id);
-    setDeletingCharacteristic(null);
+    setDeleteError(null);
+    deleteHandlingDeficit(
+      { id: deletingCharacteristic.id, workingSessionId },
+      {
+        onSuccess: () => {
+          onDeleteHandlingCharacteristic(deletingCharacteristic.id);
+          setDeletingCharacteristic(null);
+          setDeleteError(null);
+        },
+        onError: (error) => {
+          if (
+            isAxiosError<{ errors?: string[] }>(error) &&
+            Array.isArray(error.response?.data?.errors)
+          ) {
+            setDeleteError(error.response.data.errors.join(' '));
+            return;
+          }
+
+          setDeleteError('Failed to delete handling characteristic.');
+        },
+      },
+    );
   }
 
   return (
@@ -175,9 +292,21 @@ function CurrentSessionPage({
           <h3 className="handling-characteristics-title">Handling Characteristics</h3>
         </div>
 
-        {handlingCharacteristics.length === 0 ? (
+        {isLoadingDeficits && (
+          <p className="handling-characteristics-empty">Loading handling characteristics...</p>
+        )}
+
+        {isDeficitsError && (
+          <p className="handling-characteristics-empty">
+            Failed to load handling characteristics.
+          </p>
+        )}
+
+        {!isLoadingDeficits && !isDeficitsError && handlingCharacteristics.length === 0 ? (
           <p className="handling-characteristics-empty">No handling characteristics added yet.</p>
-        ) : (
+        ) : null}
+
+        {!isLoadingDeficits && !isDeficitsError && handlingCharacteristics.length > 0 ? (
           <ul className="handling-characteristic-list">
             {handlingCharacteristics.map((characteristic) => {
               const locationLabel = LOCATION_LABELS[characteristic.location];
@@ -221,7 +350,7 @@ function CurrentSessionPage({
               );
             })}
           </ul>
-        )}
+        ) : null}
 
         <button type="button" className="add-characteristic-button" onClick={handleOpenAddModal}>
           + Add
@@ -238,11 +367,13 @@ function CurrentSessionPage({
           phase={draftPhase}
           symptom={draftSymptom}
           onLocationChange={handleDraftLocationChange}
-          onPhaseChange={(phase) => setDraftPhase(phase as Phase | '')}
-          onSymptomChange={(symptom) => setDraftSymptom(symptom as Symptom | '')}
+          onPhaseChange={handleDraftPhaseChange}
+          onSymptomChange={handleDraftSymptomChange}
           onSave={handleSaveModal}
           onClose={handleCloseModal}
           isDuplicate={isDraftDuplicate}
+          saveError={saveError}
+          isSaving={isCreatingDeficit || isUpdatingDeficit}
         />
       )}
 
@@ -252,6 +383,8 @@ function CurrentSessionPage({
           valueLabel={SYMPTOM_LABELS[deletingCharacteristic.symptom]}
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
+          deleteError={deleteError}
+          isDeleting={isDeletingDeficit}
         />
       )}
     </section>

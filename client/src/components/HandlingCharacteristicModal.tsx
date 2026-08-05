@@ -15,6 +15,8 @@ interface HandlingCharacteristicModalProps {
   onSave: () => void;
   onClose: () => void;
   isDuplicate: boolean;
+  saveError?: string | null;
+  isSaving?: boolean;
 }
 
 function HandlingCharacteristicModal({
@@ -27,11 +29,17 @@ function HandlingCharacteristicModal({
   onSave,
   onClose,
   isDuplicate,
+  saveError = null,
+  isSaving = false,
 }: HandlingCharacteristicModalProps) {
   const isPhaseDisabled = location === 'global';
   const isPhaseRequired = location !== '' && !isPhaseDisabled;
   const canSave =
-    location !== '' && symptom !== '' && (!isPhaseRequired || phase !== '') && !isDuplicate;
+    location !== '' &&
+    symptom !== '' &&
+    (!isPhaseRequired || phase !== '') &&
+    !isDuplicate &&
+    !isSaving;
 
   return (
     <div className="modal-overlay" role="presentation" onClick={onClose}>
@@ -109,6 +117,8 @@ function HandlingCharacteristicModal({
               This location and phase combination has already been added.
             </p>
           )}
+
+          {saveError && <p className="detail-card-error">{saveError}</p>}
         </div>
 
         <div className="modal-actions">

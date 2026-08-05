@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { mockCreateWorkingSessionSuccess } from './helpers/workingSessionApi';
 import { mockVehicleOptions } from './helpers/vehicleOptionsApi';
+import { mockHandlingDeficitsList, mockCreateHandlingDeficitSuccess, mockCreateHandlingDeficitError, mockUpdateHandlingDeficitSuccess, mockUpdateHandlingDeficitError, mockDeleteHandlingDeficitSuccess, mockDeleteHandlingDeficitError } from './helpers/handlingDeficitsApi';
 import {
   DEFAULT_CHARACTERISTIC_LABEL,
   addHandlingCharacteristic,
@@ -98,6 +99,9 @@ test.describe('Handling Characteristics', () => {
   test.beforeEach(async ({ page }) => {
     await mockVehicleOptions(page);
     await mockCreateWorkingSessionSuccess(page);
+    await mockHandlingDeficitsList(page, 1, []);
+    await mockCreateHandlingDeficitSuccess(page, 1);
+    await mockUpdateHandlingDeficitSuccess(page);
 
     await page.goto('http://localhost:5173');
     await page.getByRole('button', { name: 'New Session' }).click();
@@ -187,6 +191,54 @@ test.describe('Handling Characteristics', () => {
     await expect(page.getByText('Oversteer')).toBeVisible();
   });
 
+  test('keeps the modal open and shows the backend error when create fails', async ({ page }) => {
+    await mockCreateHandlingDeficitError(page, 1, {
+      errors: ['Phase has already been taken'],
+    });
+
+    await page.getByRole('button', { name: '+ Add' }).click();
+    await page.getByLabel('Location', { exact: true }).selectOption({ label: 'Everywhere' });
+    await page.getByLabel('Symptom', { exact: true }).selectOption({ label: 'Oversteer' });
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByText('Phase has already been taken')).toBeVisible();
+    await expect(page.getByText('No handling characteristics added yet.')).toBeVisible();
+  });
+
+  test('disables the Save button while the create request is in flight', async ({ page }) => {
+    await page.route(`**/api/v1/working_sessions/1/handling_deficits`, async (route) => {
+      if (route.request().method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 1,
+          workingSessionId: 1,
+          location: 'global',
+          phase: null,
+          symptom: 'oversteer',
+          createdAt: new Date().toISOString(),
+        }),
+      });
+    });
+
+    await page.getByRole('button', { name: '+ Add' }).click();
+    await page.getByLabel('Location', { exact: true }).selectOption({ label: 'Everywhere' });
+    await page.getByLabel('Symptom', { exact: true }).selectOption({ label: 'Oversteer' });
+
+    const saveButton = page.getByRole('button', { name: 'Save' });
+    await saveButton.click();
+
+    await expect(saveButton).toBeDisabled();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(page.getByText('Oversteer')).toBeVisible();
+  });
+
   test('closes the modal without saving when the X button is clicked', async ({ page }) => {
     await page.getByRole('button', { name: '+ Add' }).click();
     await page.getByLabel('Location', { exact: true }).selectOption({ label: 'Everywhere' });
@@ -217,6 +269,61 @@ test.describe('Handling Characteristics', () => {
     await expect(page.getByRole('dialog')).not.toBeVisible();
     await expect(page.getByText('Understeer')).toBeVisible();
     await expect(page.getByText('Oversteer')).not.toBeVisible();
+  });
+
+  test('keeps the modal open and shows the backend error when update fails', async ({ page }) => {
+    await addHandlingCharacteristic(page, 'Oversteer');
+    await mockUpdateHandlingDeficitError(page, {
+      errors: ['Location is not included in the list'],
+    });
+
+    await page.getByRole('button', { name: `Edit ${DEFAULT_CHARACTERISTIC_LABEL}` }).click();
+    await page.getByLabel('Symptom', { exact: true }).selectOption({ label: 'Understeer' });
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByText('Location is not included in the list')).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'Oversteer' })).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'Understeer' })).toHaveCount(0);
+  });
+
+  test('disables the Save button while the update request is in flight', async ({ page }) => {
+    await addHandlingCharacteristic(page, 'Oversteer');
+
+    await page.route('**/api/v1/handling_deficits/*', async (route) => {
+      if (route.request().method() !== 'PATCH') {
+        await route.continue();
+        return;
+      }
+      const url = route.request().url();
+      const idMatch = url.match(/\/handling_deficits\/([^/?]+)/);
+      const requestId = idMatch?.[1] ?? null;
+      const responseId =
+        requestId != null && !Number.isNaN(Number(requestId)) ? Number(requestId) : 100;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: responseId,
+          workingSessionId: 1,
+          location: 'global',
+          phase: null,
+          symptom: 'understeer',
+          createdAt: new Date().toISOString(),
+        }),
+      });
+    });
+
+    await page.getByRole('button', { name: `Edit ${DEFAULT_CHARACTERISTIC_LABEL}` }).click();
+    await page.getByLabel('Symptom', { exact: true }).selectOption({ label: 'Understeer' });
+
+    const saveButton = page.getByRole('button', { name: 'Save' });
+    await saveButton.click();
+
+    await expect(saveButton).toBeDisabled();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(page.getByText('Understeer')).toBeVisible();
   });
 
   test('leaves the value unchanged when editing is cancelled via the X button', async ({
@@ -252,6 +359,9 @@ test.describe('Deleting handling characteristics', () => {
   test.beforeEach(async ({ page }) => {
     await mockVehicleOptions(page);
     await mockCreateWorkingSessionSuccess(page);
+    await mockHandlingDeficitsList(page, 1, []);
+    await mockCreateHandlingDeficitSuccess(page, 1);
+    await mockDeleteHandlingDeficitSuccess(page);
 
     await page.goto('http://localhost:5173');
     await page.getByRole('button', { name: 'New Session' }).click();
@@ -314,6 +424,41 @@ test.describe('Deleting handling characteristics', () => {
     await expect(page.getByRole('dialog')).not.toBeVisible();
     await expect(page.getByText('No handling characteristics added yet.')).toBeVisible();
     await expect(page.getByText('Oversteer')).not.toBeVisible();
+  });
+
+  test('keeps the confirmation open and shows the backend error when delete fails', async ({
+    page,
+  }) => {
+    await mockDeleteHandlingDeficitError(page, {
+      errors: ['Handling deficit not found'],
+    });
+
+    await openDeleteConfirmation(page);
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
+
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByText('Handling deficit not found')).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'Oversteer' })).toBeVisible();
+  });
+
+  test('disables the Delete button while the delete request is in flight', async ({ page }) => {
+    await page.route('**/api/v1/handling_deficits/*', async (route) => {
+      if (route.request().method() !== 'DELETE') {
+        await route.continue();
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await route.fulfill({ status: 204 });
+    });
+
+    await openDeleteConfirmation(page);
+
+    const deleteButton = page.getByRole('dialog').getByRole('button', { name: 'Delete' });
+    await deleteButton.click();
+
+    await expect(deleteButton).toBeDisabled();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(page.getByText('No handling characteristics added yet.')).toBeVisible();
   });
 
   test('deleting one handling characteristic leaves other handling characteristics intact', async ({

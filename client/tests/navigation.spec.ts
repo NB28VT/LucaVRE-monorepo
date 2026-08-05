@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { mockCreateWorkingSessionSuccess } from './helpers/workingSessionApi';
 import { mockVehicleOptions } from './helpers/vehicleOptionsApi';
+import { mockHandlingDeficitsList, mockCreateHandlingDeficitSuccess } from './helpers/handlingDeficitsApi';
 import { addHandlingCharacteristic } from './helpers/handlingCharacteristics';
 
 test.describe('Page navigation', () => {
   test.beforeEach(async ({ page }) => {
     await mockVehicleOptions(page);
+    await mockHandlingDeficitsList(page, 1, []);
+    await mockCreateHandlingDeficitSuccess(page, 1);
 
     await page.goto('http://localhost:5173');
   });

@@ -5,15 +5,17 @@ class AnthropicSdkService
         )
     end
 
-    def generate_response(prompt:)
-        response = @anthropic.messages.create(
-            max_tokens: 1024,
-            messages: [{role: "user", content: prompt}],
-            # Start with cheapest model:
-             model: "claude-haiku-4-5-20251001"
-            #  Later, use the most powerful model:
-            # model: "claude-opus-4-6"
-        )
-        return response.content
-    end
+
+    # TODO: Leverage DiagnosticPayloadBuilder to build the payload and then generate the response
+    # def generate_response(prompt:)
+    #     response = @anthropic.messages.create(
+    #         max_tokens: 1024,
+    #         messages: [{role: "user", content: prompt}],
+    #         # Start with cheapest model:
+    #          model: "claude-haiku-4-5-20251001"
+    #         #  Later, use the most powerful model:
+    #         # model: "claude-opus-4-6"
+    #     )
+    #     return response.content
+    # end
 end

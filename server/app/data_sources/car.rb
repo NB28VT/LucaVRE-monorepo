@@ -13,4 +13,8 @@ class Car < ActiveFile::Base
       JSON.parse(File.read(full_path))["cars"]
     end
   end
+
+  def to_profile_xml
+    PromptSerializers::CarXmlSerializer.new(self).to_xml
+  end
 end

@@ -17,4 +17,9 @@ class Track < ActiveFile::Base
       JSON.parse(File.read(full_path))["tracks"]
     end
   end
+
+  def to_profile_xml
+    PromptSerializers::TrackXmlSerializer.new(self).to_xml
+  end
 end
+

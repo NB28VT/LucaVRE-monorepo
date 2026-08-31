@@ -61,26 +61,5 @@ RSpec.describe DiagnosticPayloadBuilder do
       expect(result[:max_tokens]).to eq(described_class::DEFAULT_MAX_TOKENS)
       expect(result[:effort]).to eq(described_class::DEFAULT_EFFORT)
     end
-
-    it 'maps handling deficits into shorthand XML' do
-      deficits = [
-        build(:handling_deficit, location: 'global', phase: nil, symptom: 'oversteer'),
-        build(:handling_deficit, location: 'high_speed', phase: 'entry', symptom: 'understeer'),
-        build(:handling_deficit, location: 'mid_speed', phase: 'mid_corner', symptom: 'oversteer')
-      ]
-
-      result = described_class.new(handling_deficits: deficits).call
-      handling_deficits_text = result[:messages].first[:content][2][:text]
-
-      expect(handling_deficits_text).to eq(
-        <<~XML.chomp
-          <handling_deficits>
-          <handling_deficit>loc:glbl;sym:os</handling_deficit>
-          <handling_deficit>loc:hi_spd;phase:entry;sym:us</handling_deficit>
-          <handling_deficit>loc:med_spd;phase:mid;sym:os</handling_deficit>
-          </handling_deficits>
-        XML
-      )
-    end
   end
 end

@@ -15,6 +15,9 @@ module LucaVreApi
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
+  
+    # Auto load AI prompt compression dictionaries for use in XML rendering in view layer
+    config.autoload_paths << Rails.root.join("app", "dictionaries")
 
     config.api_only = true
 

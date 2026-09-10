@@ -1,0 +1,40 @@
+<track_key_mapping>
+  <% track_key_mapping.each do |description, key| %>
+    <track_key>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </track_key>
+  <% end %>
+</track_key_mapping>
+<downforce_requirement_mapping>
+  <% downforce_requirement_mapping.each do |description, key| %>
+    <downforce_requirement>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </downforce_requirement>
+  <% end %>
+</downforce_requirement_mapping>
+<surface_roughness_mapping>
+  <% surface_roughness_mapping.each do |description, key| %>
+    <surface_roughness>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </surface_roughness>
+  <% end %>
+</surface_roughness_mapping>
+<curb_intensity_mapping>
+  <% curb_intensity_mapping.each do |description, key| %>
+    <curb_intensity>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </curb_intensity>
+  <% end %>
+</curb_intensity_mapping>
+<primary_characteristic_mapping>
+  <% primary_characteristic_mapping.each do |description, key| %>
+    <primary_characteristic>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </primary_characteristic>
+  <% end %>
+</primary_characteristic_mapping>

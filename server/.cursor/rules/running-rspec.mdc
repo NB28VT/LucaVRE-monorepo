@@ -5,31 +5,35 @@ alwaysApply: true
 
 # Running RSpec / Bundler / Rails commands
 
-Do not attempt to run rspec or any database commands on your own.
+The sandboxed shell does not load chruby and injects an empty `BUNDLE_PATH`. Before `bundle`, `rspec`, or `rails`:
 
-<!-- The sandboxed shell used by the agent misconfigures the Ruby environment for this
-repo. Before running `bundle`, `rspec`, or `rails` commands, fix the environment
-in the same command:
-
-1. **Unset the sandbox's injected `BUNDLE_PATH`.** It points at an empty temp
-   cache dir (`.../cursor-sandbox-cache/.../bundle`), which breaks `bundle exec`
-   with a `Gem::Resolver::APISet::GemParser` error.
-2. **Prepend the correct Ruby 3.4.9 to `PATH`.** The sandbox's default `ruby`
-   resolves to the system Ruby 2.6.10 at `/usr/bin/ruby`, not the project's Ruby.
-   The correct interpreter lives at `~/.rubies/ruby-3.4.9/bin`.
-3. **Run commands with `required_permissions: ["full_network"]`** since bundler
-   may need network access.
+1. **Source chruby and select Ruby 3.4.9.** Default `ruby` is system 2.6.10 (`/usr/bin/ruby`). Gems live in `~/.gem/ruby/3.4.9` only after `chruby ruby-3.4.9`.
+2. **Unset `BUNDLE_PATH`.** The sandbox points it at an empty temp cache (`.../cursor-sandbox-cache/.../bundle`).
+3. **`cd` into `LucaVRE-api`.** The workspace root has no Gemfile; Bundler will otherwise walk up to `~/Gemfile`.
+4. **Use `required_permissions: ["full_network"]`.**
 
 ```bash
-export PATH="$HOME/.rubies/ruby-3.4.9/bin:$PATH"; unset BUNDLE_PATH; bundle exec rspec spec/models/handling_deficit_spec.rb
+source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+chruby ruby-3.4.9
+unset BUNDLE_PATH
+cd /Users/nathanburgess/PersonalApps/LucaVRE/LucaVRE-api
+bundle exec rspec spec/models/handling_deficit_spec.rb
 ```
+
+Always run specs with `bundle exec rspec`.
+
+## Test scope
+
+Always run targeted specs for recently changed files first. Iterate on those until they pass. Only run the full suite as a final sanity check once the targeted specs are green.
 
 ## New/pending migrations
 
-If a spec references a table from a migration that hasn't been applied to the
-test database yet, you'll see `PG::UndefinedTable: relation "..." does not
-exist`. Fix by migrating the test DB before running specs:
+If a spec hits `PG::UndefinedTable: relation "..." does not exist`, migrate the test DB first:
 
 ```bash
-export PATH="$HOME/.rubies/ruby-3.4.9/bin:$PATH"; unset BUNDLE_PATH; RAILS_ENV=test bundle exec rails db:migrate
-``` -->
+source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+chruby ruby-3.4.9
+unset BUNDLE_PATH
+cd /Users/nathanburgess/PersonalApps/LucaVRE/LucaVRE-api
+RAILS_ENV=test bundle exec rails db:migrate
+```

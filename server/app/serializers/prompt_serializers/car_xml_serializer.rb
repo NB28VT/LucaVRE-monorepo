@@ -20,10 +20,10 @@ module PromptSerializers
 
     def serialize_car_characteristics
       [
-        "ep:#{Dictionaries::CarDictionary::ENGINE_PLACEMENT_MAPPING[@car.engine_placement]}",
-        "ap:#{Dictionaries::CarDictionary::AERO_PLATFORM_MAPPING[@car.aero_platform]}",
-        "wb:#{Dictionaries::CarDictionary::WHEELBASE_MAPPING[@car.wheelbase]}",
-        "pq:#{Array(@car.primary_quirk).map { |quirk| Dictionaries::CarDictionary::PRIMARY_QUIRK_MAPPING[quirk] }.compact.join(',')}"
+        "ep:#{::CarDictionary::ENGINE_PLACEMENT_MAPPING[@car.engine_placement]}",
+        "ap:#{::CarDictionary::AERO_PLATFORM_MAPPING[@car.aero_platform]}",
+        "wb:#{::CarDictionary::WHEELBASE_MAPPING[@car.wheelbase]}",
+        "pq:#{Array(@car.primary_quirk).map { |quirk| ::CarDictionary::PRIMARY_QUIRK_MAPPING[quirk] }.compact.join(',')}"
       ]
     end
   end

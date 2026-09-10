@@ -1,0 +1,40 @@
+<car_key_mapping>
+<% car_key_mapping.each do |description, key| %>
+  <mapping>
+    <key><%= key %></key>
+    <value><%= description %></value>
+  </mapping>
+<% end %>
+</car_key_mapping>
+<engine_placement_mapping>
+  <% engine_placement_mapping.each do |description, key| %>
+    <mapping>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </mapping>
+  <% end %>
+</engine_placement_mapping>
+<aero_platform_mapping>
+  <% aero_platform_mapping.each do |description, key| %>
+    <mapping>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </mapping>
+  <% end %>
+</aero_platform_mapping>
+<wheelbase_mapping>
+  <% wheelbase_mapping.each do |description, key| %>
+    <mapping>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </mapping>
+  <% end %>
+</wheelbase_mapping>
+<primary_quirk_mapping>
+  <% primary_quirk_mapping.each do |description, key| %>
+    <mapping>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </mapping>
+  <% end %>
+</primary_quirk_mapping>

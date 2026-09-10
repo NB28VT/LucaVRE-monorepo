@@ -16,9 +16,9 @@ module PromptSerializers
 
     def serialize_deficit_characteristics
       [
-        "loc:#{Dictionaries::HandlingDeficitDictionary::HANDLING_DEFICIT_LOCATION_MAPPING[@handling_deficit.location]}",
-        ("phase:#{Dictionaries::HandlingDeficitDictionary::HANDLING_DEFICIT_PHASE_MAPPING[@handling_deficit.phase]}" if @handling_deficit.phase.present?),
-        "sym:#{Dictionaries::HandlingDeficitDictionary::HANDLING_DEFICIT_SYMPTOM_MAPPING[@handling_deficit.symptom]}"
+        "loc:#{::HandlingDeficitDictionary::HANDLING_DEFICIT_LOCATION_MAPPING[@handling_deficit.location]}",
+        ("phase:#{::HandlingDeficitDictionary::HANDLING_DEFICIT_PHASE_MAPPING[@handling_deficit.phase]}" if @handling_deficit.phase.present?),
+        "sym:#{::HandlingDeficitDictionary::HANDLING_DEFICIT_SYMPTOM_MAPPING[@handling_deficit.symptom]}"
       ].compact.join(';')
     end
   end

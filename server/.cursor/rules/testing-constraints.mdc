@@ -1,0 +1,11 @@
+---
+description: Guidelines for building RSpec tests in this repo
+alwaysApply: true
+---
+
+- **Testing Approach**: Unit and integration tests can only be built in RSpec
+- **Atomic Testing**: Tests must center on single discrete, deterministic behaviors
+- **Discrete Testing**: Tests must not unecessarily duplicate testing the same behaviors
+- **Testing Data**: ActiveRecord objects should not be created in the database without using FactoryBot
+- **Factory Usage**: Prefer the `build` method in FactoryBot to `create` where possible to speed up test setup and teardown
+

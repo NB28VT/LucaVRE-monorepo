@@ -1,0 +1,8 @@
+---
+description: Guidelines for development
+alwaysApply: true
+---
+
+- **Iterative Development**: Prefer committing small, iterative changes
+- **Git Commits**: Do not commit code changes to git unless given permission to do so. Ask when you are ready to do this.
+- **Idempotency**: Code changes must not break existing functionality. Run `bundle exec rspec` according to instructions in your .cursorrules before declaring a task complete.

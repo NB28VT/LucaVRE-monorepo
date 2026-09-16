@@ -20,10 +20,11 @@ module PromptSerializers
 
     def serialize_track_characteristics
       [
-        "dr:#{::TrackDictionary::DOWNFORCE_REQUIREMENT_MAPPING[@track.downforce_requirement]}",
-        "sr:#{::TrackDictionary::SURFACE_ROUGHNESS_MAPPING[@track.surface_roughness]}",
-        "ci:#{::TrackDictionary::CURB_INTENSITY_MAPPING[@track.curb_intensity]}",
-        "pc:#{Array(@track.primary_characteristic).map { |characteristic| ::TrackDictionary::PRIMARY_CHARACTERISTIC_MAPPING[characteristic] }.compact.join(',')}"
+        "ar:#{::TrackDictionary::AERO_REQUIREMENT_MAPPING[@track.aero_requirement]}",
+        "cs:#{::TrackDictionary::DOMINANT_CORNER_SPEED_MAPPING[@track.dominant_corner_speed]}",
+        "sb:#{::TrackDictionary::SURFACE_BUMPINESS_MAPPING[@track.surface_bumpiness]}",
+        "td:#{::TrackDictionary::TIRE_DEGRADATION_RATE_MAPPING[@track.tire_degradation_rate]}",
+        "lt:#{::TrackDictionary::LAYOUT_TYPE_MAPPING[@track.layout_type]}"
       ]
     end
   end

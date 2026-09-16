@@ -8,7 +8,7 @@ RSpec.describe PromptSerializers::CarXmlSerializer, type: :serializer do
       expected_xml = <<~XML
         <car_profile>
           <chassis_name>Ferrari 296 LMGT3</chassis_name>
-          <car_characteristics>ep:mr;ap:ps;wb:sh;pq:fro,sal,sfg,sod,hag,ubc</car_characteristics>
+          <car_characteristics>el:me;ad:hi;wb:sh;wd:rb</car_characteristics>
         </car_profile>
       XML
 

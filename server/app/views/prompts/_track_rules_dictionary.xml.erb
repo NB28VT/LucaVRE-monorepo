@@ -1,40 +1,48 @@
 <track_key_mapping>
-  <% track_key_mapping.each do |description, key| %>
-    <track_key>
-      <key><%= key %></key>
-      <value><%= description %></value>
-    </track_key>
-  <% end %>
+<% track_key_mapping.each do |description, key| %>
+  <mapping>
+    <key><%= key %></key>
+    <value><%= description %></value>
+  </mapping>
+<% end %>
 </track_key_mapping>
-<downforce_requirement_mapping>
-  <% downforce_requirement_mapping.each do |description, key| %>
-    <downforce_requirement>
+<aero_requirement_mapping>
+  <% aero_requirement_mapping.each do |description, key| %>
+    <mapping>
       <key><%= key %></key>
       <value><%= description %></value>
-    </downforce_requirement>
+    </mapping>
   <% end %>
-</downforce_requirement_mapping>
-<surface_roughness_mapping>
-  <% surface_roughness_mapping.each do |description, key| %>
-    <surface_roughness>
+</aero_requirement_mapping>
+<dominant_corner_speed_mapping>
+  <% dominant_corner_speed_mapping.each do |description, key| %>
+    <mapping>
       <key><%= key %></key>
       <value><%= description %></value>
-    </surface_roughness>
+    </mapping>
   <% end %>
-</surface_roughness_mapping>
-<curb_intensity_mapping>
-  <% curb_intensity_mapping.each do |description, key| %>
-    <curb_intensity>
+</dominant_corner_speed_mapping>
+<surface_bumpiness_mapping>
+  <% surface_bumpiness_mapping.each do |description, key| %>
+    <mapping>
       <key><%= key %></key>
       <value><%= description %></value>
-    </curb_intensity>
+    </mapping>
   <% end %>
-</curb_intensity_mapping>
-<primary_characteristic_mapping>
-  <% primary_characteristic_mapping.each do |description, key| %>
-    <primary_characteristic>
+</surface_bumpiness_mapping>
+<tire_degradation_rate_mapping>
+  <% tire_degradation_rate_mapping.each do |description, key| %>
+    <mapping>
       <key><%= key %></key>
       <value><%= description %></value>
-    </primary_characteristic>
+    </mapping>
   <% end %>
-</primary_characteristic_mapping>
+</tire_degradation_rate_mapping>
+<layout_type_mapping>
+  <% layout_type_mapping.each do |description, key| %>
+    <mapping>
+      <key><%= key %></key>
+      <value><%= description %></value>
+    </mapping>
+  <% end %>
+</layout_type_mapping>

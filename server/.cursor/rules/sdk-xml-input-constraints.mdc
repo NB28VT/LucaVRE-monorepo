@@ -1,0 +1,12 @@
+---
+description: Guidelines for generating XML input for the Anthropic SDK
+alwaysApply: true
+---
+- **Scope**: when writing services that generate XML inputs for the Anthropic SDK
+- **XML Formatting Restrictions**: only input semantic, valid XML with clean, human-readable nesting and no uncessary spaces between tags. Indent all nested tags by two spaces, or whatever XML_INDENTATION is defined in app/serializers/prompt_serializers/base_xml_serializer.rb
+- **Testing assembled system prompt XML**: Only verify clean nesting and no unnecessary spacing. Compare the assembled string to `Nokogiri::XML(xml, &:noblanks).root.to_xml(indent: XML_INDENTATION)`. Do not assert tag names, inner text, or dynamically generated dictionary content. Do not use regex or line-by-line indent walkers.
+- **Pretty-print assembled ERB XML**: After rendering prompt templates, parse with `Nokogiri::XML(xml, &:noblanks)` and serialize `root.to_xml(indent: XML_INDENTATION)`. `noblanks` drops whitespace-only nodes so element-only subtrees can be re-indented. Call `root.to_xml` rather than `doc.to_xml` so the output has no XML declaration.
+- **ERB partials do not inherit parent indent**: `<%= render partial: %>` only preserves spaces on the first line of the partial. Every following line is emitted at column 0, which misaligns nesting. Start element-only partials at column 0 with internally consistent `XML_INDENTATION` and let the assembler pretty-printer place the subtree. Do not try to nest a multi-line partial by indenting the `render` call.
+- **Mixed-content elements are not re-indented**: Tags that contain both text and child elements (for example `domain_knowledge_guardrails` or `simulator_specific_quirks`) keep their original inner whitespace under Nokogiri pretty-print. Indent those children correctly in the `.xml.erb` template itself, using `XML_INDENTATION` relative to the parent tag.
+- **One indent width**: Use `XML_INDENTATION` (2 spaces) in parent templates and partials. Do not mix 2-space and 4-space tag indent.
+- **No blank lines between tags**: Do not insert empty lines between sibling tags or after an opening tag. A single paragraph break inside a text-only node is allowed. Use ERB trim (`-%>`) on loops in XML partials so Ruby block tags do not emit extra blank lines.

@@ -1,0 +1,10 @@
+---
+description: Guidelines for working with the Anthropic Ruby SDK
+alwaysApply: true
+---
+
+## Context & External APIs
+- This backend interfaces with Claude using the `anthropic` Ruby gem.
+- For all SDK implementation syntax, payload structures, and error classes, rely on the official SDK documentation reference: 
+  [Anthropic Ruby SDK Docs](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/ruby)
+- CRITICAL: When writing tool calling or structured schemas, strictly use the gem's native `Anthropic::BaseModel` and `Anthropic::BaseTool` DSL as defined in the reference link. Do not guess parameter patterns.

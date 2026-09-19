@@ -8,4 +8,5 @@ alwaysApply: true
 - **Discrete Testing**: Tests must not unecessarily duplicate testing the same behaviors
 - **Testing Data**: ActiveRecord objects should not be created in the database without using FactoryBot
 - **Factory Usage**: Prefer the `build` method in FactoryBot to `create` where possible to speed up test setup and teardown
-
+- **External Service Testing**: Do not implement any automated tests that exectute a live to an external API service.
+- **Anthropic SDK Testing**: Do not implement any automated tests that execute a live call to the Anthropic SDK or any outside services. Prefer mocking the response as defined in the [Anthropic Ruby SDK Docs](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/ruby)

@@ -4,16 +4,15 @@ class SystemRulesAssembler
   end
 
   def assemble
-    begin
-      # Render xml prompt view
-      xml = ActionController::Base.render(
-        template: "prompts/#{@version}/system_rules",
-        formats: [:xml]
-      )
+    xml = ActionController::Base.render(
+      template: "prompts/#{@version}/system_rules",
+      formats: [:xml]
+    )
 
-      puts Nokogiri::XML(xml).to_xml(indent: 2)
-    rescue ActionView::MissingTemplate => e
-      Rails.logger.error("Template fallback triggered: #{e.message}")
-    end
+    Nokogiri::XML(xml, &:noblanks).root.to_xml(
+      indent: PromptSerializers::BaseXmlSerializer::XML_INDENTATION
+    )
+  rescue ActionView::MissingTemplate => e
+    Rails.logger.error("Template fallback triggered: #{e.message}")
   end
 end

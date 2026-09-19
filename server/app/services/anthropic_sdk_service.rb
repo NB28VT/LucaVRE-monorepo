@@ -1,21 +1,25 @@
 class AnthropicSdkService
-    def initialize
-        @anthropic = Anthropic::Client.new(
-            api_key: Rails.application.credentials.dig(:anthropic, :api_key)
-        )
-    end
+  DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5"
+  DEFAULT_MAX_TOKENS = 1500
+  DEFAULT_EFFORT = "high"
 
+  def initialize(client: Anthropic::Client.new(api_key: Rails.application.credentials.dig(:anthropic, :api_key)))
+    @client = client
+  end
 
-    # TODO: Leverage DiagnosticPayloadBuilder to build the payload and then generate the response
-    # def generate_response(prompt:)
-    #     response = @anthropic.messages.create(
-    #         max_tokens: 1024,
-    #         messages: [{role: "user", content: prompt}],
-    #         # Start with cheapest model:
-    #          model: "claude-haiku-4-5-20251001"
-    #         #  Later, use the most powerful model:
-    #         # model: "claude-opus-4-6"
-    #     )
-    #     return response.content
-    # end
+  def generate_response(system_rules:, messages:)
+    @client.messages.create(
+      model: DEFAULT_ANTHROPIC_MODEL,
+      max_tokens: DEFAULT_MAX_TOKENS,
+      output_config: { effort: DEFAULT_EFFORT },
+      system_: [
+        {
+          type: "text",
+          text: system_rules,
+          cache_control: { type: "ephemeral" }
+        }
+      ],
+      messages: messages
+    )
+  end
 end

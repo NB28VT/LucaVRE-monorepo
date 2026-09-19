@@ -14,8 +14,8 @@ RSpec.describe AnthropicSdkService do
       allow(messages_resource).to receive(:create).and_return(sdk_response)
     end
 
-    def generate
-      service.generate_response(system_rules: system_rules, messages: messages)
+    def generate(**kwargs)
+      service.generate_response(system_rules: system_rules, messages: messages, **kwargs)
     end
 
     it "uses the default model, max_tokens, and effort" do
@@ -26,6 +26,29 @@ RSpec.describe AnthropicSdkService do
           model: described_class::DEFAULT_ANTHROPIC_MODEL,
           max_tokens: described_class::DEFAULT_MAX_TOKENS,
           output_config: { effort: described_class::DEFAULT_EFFORT }
+        )
+      )
+    end
+
+    it "enables adaptive summarized thinking" do
+      generate
+
+      expect(messages_resource).to have_received(:create).with(
+        hash_including(thinking: described_class::DEFAULT_THINKING)
+      )
+    end
+
+    it "wraps a supplied output_format in output_config.format" do
+      schema = { type: "object", properties: {} }
+
+      generate(output_format: schema)
+
+      expect(messages_resource).to have_received(:create).with(
+        hash_including(
+          output_config: {
+            effort: described_class::DEFAULT_EFFORT,
+            format: { type: :json_schema, schema: schema }
+          }
         )
       )
     end

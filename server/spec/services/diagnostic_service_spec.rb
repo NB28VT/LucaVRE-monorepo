@@ -94,5 +94,91 @@ RSpec.describe DiagnosticService do
     it "returns the SDK response" do
       expect(service.call).to eq(sdk_response)
     end
+
+    it "passes the structured output schema through to the SDK service" do
+      service.call
+
+      expect(generate_kwargs[:output_format]).to eq(described_class::OUTPUT_SCHEMA)
+    end
+  end
+
+  describe "OUTPUT_SCHEMA" do
+    let(:schema) { described_class::OUTPUT_SCHEMA }
+    let(:properties) { schema[:properties] }
+
+    it "allows only the nine in-game GT3 garage settings as optional properties" do
+      expect(schema[:type]).to eq("object")
+      expect(schema[:additionalProperties]).to eq(false)
+      expect(schema[:required]).to eq([])
+      expect(properties.keys).to eq(
+        %i[
+          brake_bias
+          rear_wing
+          front_ride_height
+          rear_ride_height
+          front_arb
+          rear_arb
+          tire_pressures
+          tc_cut
+          tc_slip
+        ]
+      )
+    end
+
+    it "does not include a thinking field" do
+      expect(properties).not_to have_key(:thinking)
+    end
+
+    it "enumerates brake_bias as percents from 40.0 to 60.0 in 0.1 increments" do
+      values = properties[:brake_bias][:enum]
+
+      expect(properties[:brake_bias][:type]).to eq("number")
+      expect(values.first).to eq(40.0)
+      expect(values.last).to eq(60.0)
+      expect(values.size).to eq(201)
+      expect(values.each_cons(2).all? { |left, right| (right - left).round(1) == 0.1 }).to be(true)
+    end
+
+    it "enumerates rear_wing as integer steps from 1 to 12" do
+      expect(properties[:rear_wing][:type]).to eq("integer")
+      expect(properties[:rear_wing][:enum]).to eq((1..12).to_a)
+    end
+
+    it "enumerates front_ride_height as millimeters from 45.0 to 85.0 in 0.5 increments" do
+      values = properties[:front_ride_height][:enum]
+
+      expect(properties[:front_ride_height][:type]).to eq("number")
+      expect(values.first).to eq(45.0)
+      expect(values.last).to eq(85.0)
+      expect(values.each_cons(2).all? { |left, right| (right - left).round(1) == 0.5 }).to be(true)
+    end
+
+    it "enumerates rear_ride_height as millimeters from 60.0 to 115.0 in 0.5 increments" do
+      values = properties[:rear_ride_height][:enum]
+
+      expect(properties[:rear_ride_height][:type]).to eq("number")
+      expect(values.first).to eq(60.0)
+      expect(values.last).to eq(115.0)
+      expect(values.each_cons(2).all? { |left, right| (right - left).round(1) == 0.5 }).to be(true)
+    end
+
+    it "enumerates front and rear ARB as clicks from 1 to 7" do
+      expect(properties[:front_arb][:type]).to eq("integer")
+      expect(properties[:rear_arb][:type]).to eq("integer")
+      expect(properties[:front_arb][:enum]).to eq((1..7).to_a)
+      expect(properties[:rear_arb][:enum]).to eq((1..7).to_a)
+    end
+
+    it "enumerates tire_pressures as cold kPa from 130 to 160" do
+      expect(properties[:tire_pressures][:type]).to eq("integer")
+      expect(properties[:tire_pressures][:enum]).to eq((130..160).to_a)
+    end
+
+    it "enumerates tc_cut and tc_slip as map positions from 1 to 11" do
+      expect(properties[:tc_cut][:type]).to eq("integer")
+      expect(properties[:tc_slip][:type]).to eq("integer")
+      expect(properties[:tc_cut][:enum]).to eq((1..11).to_a)
+      expect(properties[:tc_slip][:enum]).to eq((1..11).to_a)
+    end
   end
 end

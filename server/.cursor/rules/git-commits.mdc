@@ -1,0 +1,15 @@
+---
+description: How to run git in LucaVRE-api from the sandboxed shell
+alwaysApply: true
+---
+
+# Git in LucaVRE-api
+
+LucaVRE-api is its own git repository (`.git` lives in `LucaVRE-api/`, not the PersonalApps/LucaVRE workspace root).
+
+The default sandbox cannot see `.git`, so `git status` fails with `fatal: not a git repository`. Git commands that read or write the repo must:
+
+1. **`cd` into `LucaVRE-api`.**
+2. **Use `required_permissions: ["all"]`** so `.git` is visible and commits can be written.
+
+Do not initialize a new git repo. Do not commit unless the user asked.

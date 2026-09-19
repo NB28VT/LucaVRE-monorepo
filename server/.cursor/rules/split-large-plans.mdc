@@ -1,0 +1,20 @@
+---
+description: Split large plans into commit-sized parts and stop between them
+alwaysApply: true
+---
+
+# Split large plans
+
+- Split large plans into discrete logical parts that can be reviewed and committed independently (for example implementation, then a future-feature spec, then roadmap or process rules).
+- Each part is one concern. Do not mix shipping code with deferred-design docs in the same part unless they cannot stand alone.
+- After finishing a part, stop and let the user commit. Do not start the next part until they ask.
+
+```markdown
+# BAD
+One plan step that adds DiagnosticLog, a cache spec, and roadmap rules together.
+
+# GOOD
+Part 1: logging layer, then stop.
+Part 2: cache specification, then stop.
+Part 3: planning roadmap and process rules, then stop.
+```

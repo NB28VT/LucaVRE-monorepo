@@ -1,0 +1,19 @@
+---
+description: Specification documents for features that are not implemented yet
+alwaysApply: true
+---
+
+# Unimplemented feature specs
+
+- Never propose or write RSpec (including pending, skipped, or `xit` examples) for a feature that is still being designed or has not been implemented.
+- For those features, write a specification document under `docs/features/` only.
+- Write tests only when implementing the feature, against that document.
+
+```markdown
+# BAD — tests for a feature that does not exist yet
+# spec/services/diagnostic_service_cache_spec.rb
+it "skips the SDK on a cache hit", pending: "caching layer not implemented yet"
+
+# GOOD — specification only until the feature is scheduled
+# docs/features/diagnostic_response_cache.md
+```

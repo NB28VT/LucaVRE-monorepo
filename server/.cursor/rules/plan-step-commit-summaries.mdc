@@ -1,0 +1,24 @@
+---
+description: After each plan step, give a copy-paste commit summary and do not commit
+alwaysApply: true
+---
+
+# Plan step commit summaries
+
+When you finish implementing a step of a plan created in this repo:
+
+- Do not create a git commit, stage files, or run `git commit` unless the user explicitly asks you to commit in that message.
+- End the step with a commit summary they can copy-paste. Match this repository's short title-plus-why style (one title line, optional one-sentence body).
+- Put the summary in a fenced code block so it is easy to copy.
+
+```markdown
+# BAD
+git commit -m "Specify diagnostic response caching"
+
+# GOOD
+Finish the step, then give:
+
+Specify diagnostic response caching without implementing it
+
+Document how DiagnosticService should reuse a DiagnosticLog for the same session car, track, and deficit set.
+```

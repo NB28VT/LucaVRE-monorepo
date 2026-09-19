@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "diagnostic_logs", force: :cascade do |t|
+    t.string "car_id", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "recommendations", default: {}, null: false
+    t.text "thought_process"
+    t.string "track_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "working_session_id", null: false
+    t.index ["working_session_id"], name: "index_diagnostic_logs_on_working_session_id"
+  end
+
+  create_table "diagnostic_logs_handling_deficits", id: false, force: :cascade do |t|
+    t.bigint "diagnostic_log_id", null: false
+    t.bigint "handling_deficit_id", null: false
+    t.index ["diagnostic_log_id", "handling_deficit_id"], name: "index_diagnostic_logs_handling_deficits_uniqueness", unique: true
+    t.index ["handling_deficit_id"], name: "index_diagnostic_logs_handling_deficits_on_handling_deficit_id"
+  end
 
   create_table "handling_deficits", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -32,5 +50,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "diagnostic_logs", "working_sessions"
+  add_foreign_key "diagnostic_logs_handling_deficits", "diagnostic_logs", on_delete: :cascade
+  add_foreign_key "diagnostic_logs_handling_deficits", "handling_deficits", on_delete: :cascade
   add_foreign_key "handling_deficits", "working_sessions"
 end

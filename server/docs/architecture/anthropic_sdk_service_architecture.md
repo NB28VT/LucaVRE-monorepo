@@ -18,6 +18,4 @@
 #### Diagnostic Service
 - **Purpose**: Orchestrates the call to the Anthropic SDK by combining the Anthropic SDK Client, assembled system rules from the System Rules Assembler, and generating messages for `car_data`, `track_data` and `handling_deficits` for a specific user `working_session`.
 - **Response Schema**: Owns the structured-output JSON schema (`output_config.format`). Each property is one Le Mans Ultimate GT3 garage setting, enumerated in the units and increments the player can set in-game. Properties are optional so omitted settings are unchanged. A five-recommendation cap cannot be grammar-enforced (`maxItems` / `maxProperties` are unsupported); it is requested in the schema description. Thought process is not part of this schema; it is returned as summarized thinking content blocks from the SDK client.
-
-### Currently Out of Scope
-- **Logging**: At this time we are not yet implementing a logging infrastructure to handle responses from the Anthropic SDK. Until a logging layer exists, return the SDK response to the caller. Do not print it.
+- **Logging**: After a successful SDK call, persists a `DiagnosticLog` with parsed recommendations and summarized thinking, tied to the working session and the car, track, and handling deficits submitted with that call. Still returns the SDK response to the caller. Do not print the response.

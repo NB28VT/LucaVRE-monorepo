@@ -23,4 +23,5 @@ alwaysApply: true
 
 ## Return values
 - Services return the SDK response to the caller.
-- Do not `puts` (or otherwise print) as a stand-in for a logging layer.
+- `DiagnosticService` persists a `DiagnosticLog` for each SDK submission (recommendations from `parsed_output`, thought process from summarized thinking blocks) associated to the working session and the car, track, and handling deficits submitted with that call.
+- Do not `puts` (or otherwise print) as a stand-in for that logging layer.

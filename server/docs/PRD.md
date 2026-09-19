@@ -32,6 +32,7 @@ So that I can prevent the car from understeering mid-corner in high-speed corner
 - **Track** (ActiveFile::Base data source): the metadata for the selected track, (e.g. Monza), stored in JSON metadata in db/data/tracks.json.
 - **Working Session** (ActiveRecord model): a single combination of a track and car a user is working on.
 - **Handling Deficit** (ActiveRecord model): the location on track (high-speed, medium-speed or low-speed corners), the phase of the corner (entry, mid-corner, exit) and the car behavior (understeer or oversteer) they are trying to address when making setup changes to the car. A Working Session can have one or more handling deficits
+- **Diagnostic Log** (ActiveRecord model): one Anthropic SDK submission from `DiagnosticService`. Stores the structured setup recommendations and summarized thought process, associated to the working session and the car, track, and handling deficits submitted with that call. A Working Session can have a history of diagnostic logs.
 
 ## API Endpoints
 - **API Versioning**: All API endpoints are versioned under api/X, where X is the version. (v1 is the initial version)

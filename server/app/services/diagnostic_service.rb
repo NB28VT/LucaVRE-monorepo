@@ -75,14 +75,48 @@ class DiagnosticService
 
   def call
     system_rules = @system_rules_assembler.assemble
-    @anthropic_sdk_service.generate_response(
+    response = @anthropic_sdk_service.generate_response(
       system_rules: system_rules,
       messages: messages,
       output_format: OUTPUT_SCHEMA
     )
+    persist_diagnostic_log(response)
+    response
   end
 
   private
+
+  def persist_diagnostic_log(response)
+    DiagnosticLog.create!(
+      working_session: @working_session,
+      car_id: @working_session.car_id,
+      track_id: @working_session.track_id,
+      handling_deficits: @working_session.handling_deficits.to_a,
+      recommendations: extract_recommendations(response),
+      thought_process: extract_thought_process(response)
+    )
+  end
+
+  def extract_recommendations(response)
+    output = response.parsed_output
+    return {} if output.nil?
+
+    hash = output.respond_to?(:deep_to_h) ? output.deep_to_h : output
+    hash.respond_to?(:to_h) ? hash.to_h : {}
+  end
+
+  def extract_thought_process(response)
+    return nil unless response.respond_to?(:content)
+
+    thinking = Array(response.content).filter_map do |block|
+      next unless block.respond_to?(:type) && block.type == :thinking
+      next unless block.respond_to?(:thinking)
+
+      block.thinking.presence
+    end
+
+    thinking.join("\n\n").presence
+  end
 
   def messages
     [

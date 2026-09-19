@@ -13,7 +13,9 @@ RSpec.describe DiagnosticService do
     end
     let(:system_rules_assembler) { instance_double(SystemRulesAssembler, assemble: "assembled system rules") }
     let(:anthropic_sdk_service) { instance_double(AnthropicSdkService) }
-    let(:sdk_response) { "mocked sdk response" }
+    let(:sdk_response) do
+      instance_double(Anthropic::Models::Message, parsed_output: {}, content: [])
+    end
     let(:generate_kwargs) { {} }
     let(:service) do
       described_class.new(
@@ -25,6 +27,7 @@ RSpec.describe DiagnosticService do
     let(:content) { generate_kwargs[:messages].first[:content] }
 
     before do
+      allow(DiagnosticLog).to receive(:create!)
       allow(working_session).to receive(:handling_deficits).and_return(handling_deficits)
       allow(anthropic_sdk_service).to receive(:generate_response) do |**kwargs|
         generate_kwargs.merge!(kwargs)
@@ -99,6 +102,69 @@ RSpec.describe DiagnosticService do
       service.call
 
       expect(generate_kwargs[:output_format]).to eq(described_class::OUTPUT_SCHEMA)
+    end
+
+    context "when persisting the SDK response" do
+      let(:working_session) do
+        create(:working_session, car_id: "ferrari_296_lmgt3", track_id: "spa_francorchamps_gp")
+      end
+      let(:handling_deficits) do
+        [
+          create(:handling_deficit, working_session: working_session, location: "high_speed", phase: "entry", symptom: "understeer"),
+          create(:handling_deficit, working_session: working_session, location: "low_speed", phase: "exit", symptom: "oversteer")
+        ]
+      end
+      let(:thinking_block) do
+        instance_double(Anthropic::Models::ThinkingBlock, type: :thinking, thinking: "Stiffen the rear ARB for exit oversteer.")
+      end
+      let(:sdk_response) do
+        instance_double(
+          Anthropic::Models::Message,
+          parsed_output: { "rear_arb" => 5, "tc_slip" => 8 },
+          content: [thinking_block]
+        )
+      end
+
+      before do
+        allow(DiagnosticLog).to receive(:create!).and_call_original
+      end
+
+      it "returns the SDK response" do
+        expect(service.call).to eq(sdk_response)
+      end
+
+      it "persists a diagnostic log for the working session" do
+        expect { service.call }.to change(DiagnosticLog, :count).by(1)
+
+        log = DiagnosticLog.last
+        expect(log.working_session).to eq(working_session)
+      end
+
+      it "copies car and track ids from the working session" do
+        service.call
+
+        log = DiagnosticLog.last
+        expect(log.car_id).to eq("ferrari_296_lmgt3")
+        expect(log.track_id).to eq("spa_francorchamps_gp")
+      end
+
+      it "associates the handling deficits submitted with the call" do
+        service.call
+
+        expect(DiagnosticLog.last.handling_deficits).to match_array(handling_deficits)
+      end
+
+      it "stores parsed recommendations" do
+        service.call
+
+        expect(DiagnosticLog.last.recommendations).to eq("rear_arb" => 5, "tc_slip" => 8)
+      end
+
+      it "stores concatenated thinking text" do
+        service.call
+
+        expect(DiagnosticLog.last.thought_process).to eq("Stiffen the rear ARB for exit oversteer.")
+      end
     end
   end
 

@@ -1,0 +1,23 @@
+---
+description: Propose roadmap summaries when planning features to design later
+alwaysApply: true
+---
+
+# Planning roadmap
+
+When the user asks to make a plan for something to **design in the future** (specify now, implement later):
+
+- Propose adding a short summary of that feature to `docs/planning_roadmap.md`.
+- The summary should state the problem, that it is not in the current implementation pass, and link to the `docs/features/` specification if one is being written or already exists.
+- Do not implement the future feature in that pass unless the user explicitly asks to build it.
+
+Skip the proposal when the user is asking to implement something now. Remove the item from the roadmap when it ships.
+
+```markdown
+# BAD
+Plan a future cache, then also implement it in the same pass.
+
+# GOOD
+Plan the cache, write docs/features/diagnostic_response_cache.md,
+and propose a summary entry on docs/planning_roadmap.md.
+```

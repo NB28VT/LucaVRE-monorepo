@@ -84,6 +84,14 @@ class DiagnosticService
     response
   end
 
+  def self.recommendations_from(response)
+    output = response.parsed_output
+    return {} if output.nil?
+
+    hash = output.respond_to?(:deep_to_h) ? output.deep_to_h : output
+    hash.respond_to?(:to_h) ? hash.to_h : {}
+  end
+
   private
 
   def persist_diagnostic_log(response)
@@ -92,17 +100,9 @@ class DiagnosticService
       car_id: @working_session.car_id,
       track_id: @working_session.track_id,
       handling_deficits: @working_session.handling_deficits.to_a,
-      recommendations: extract_recommendations(response),
+      recommendations: self.class.recommendations_from(response),
       thought_process: extract_thought_process(response)
     )
-  end
-
-  def extract_recommendations(response)
-    output = response.parsed_output
-    return {} if output.nil?
-
-    hash = output.respond_to?(:deep_to_h) ? output.deep_to_h : output
-    hash.respond_to?(:to_h) ? hash.to_h : {}
   end
 
   def extract_thought_process(response)

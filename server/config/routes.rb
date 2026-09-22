@@ -16,10 +16,10 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :working_sessions, only: [:index, :show, :create, :update, :destroy] do
         resources :handling_deficits, only: [:index, :create, :show, :update, :destroy], shallow: true
+        resource :diagnostic, only: :create, controller: "diagnostics"
       end
       resources :cars, only: [:index]
       resources :tracks, only: [:index]
     end
   end
 end
-

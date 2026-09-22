@@ -1,0 +1,10 @@
+---
+description: Version new API endpoints under the current API namespace
+alwaysApply: true
+---
+
+# API versioning
+
+- New endpoints belong in `namespace :api` / `namespace :v1` in `config/routes.rb` and in `app/controllers/api/v1/`.
+- Controllers subclass `ActionController::API` and send and receive JSON.
+- Do not add an unversioned route. A later version gets its own namespace. Do not add new actions to an unversioned controller.

@@ -110,3 +110,8 @@ it "skips the SDK on a cache hit", pending: "caching layer not implemented yet"
 - **One indent width**: Use `XML_INDENTATION` (2 spaces) in parent templates and partials. Do not mix 2-space and 4-space tag indent.
 - **No blank lines between tags**: Do not insert empty lines between sibling tags or after an opening tag. A single paragraph break inside a text-only node is allowed. Use ERB trim (`-%>`) on loops in XML partials so Ruby block tags do not emit extra blank lines.
 
+# Strict Domain & Anti-Hallucination Rules
+- NEVER guess or hallucinate vehicle layouts, weight distributions, or drivetrain configurations.
+- ALL mechanical advice must factor in the specific car design retrieved from our data layer (e.g., Rear-Engine Porsche 911 GT3 R vs. Mid-Engine Ferrari 296 GT3).
+- If a car or track is not explicitly defined in our data schema, the system must gracefully prompt for data rather than making up fictional telemetry assumptions.
+- Setup advice must adhere to true vehicle dynamics principles (e.g., softening front anti-roll bars reduces turn-in understeer).

@@ -20,8 +20,6 @@ You are a senior frontend software engineer. Always write code that respects the
 - Assume all browser binaries and project dependencies are already successfully installed locally by the user.
 - Prefer letting the user execute test runner commands manually unless explicitly told to run them in the chat.
 
-
-
 # Coding Standards
 - Write clean, modular, and strictly-typed [TypeScript] code.
 - Prefer functional programming patterns and descriptive variable names.

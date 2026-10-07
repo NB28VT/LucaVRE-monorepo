@@ -21,7 +21,7 @@ So that I can prevent the car from understeering mid-corner in high-speed corner
 - **Automated Testing Framework**: RSpec Rails
 - **Automated Testing Data Generation**: FactoryBot
 - **Database Engine**: PostgreSQL
-- **Front End Framework**: the front end is stored in a separate repo from this one and is built in React.js with TypeScript and TanStack Query for calls to this API.
+- **Front End Framework**: the front end is in the /client directory and is built with React.js with TypeScript and TanStack Query for calls to the API.
 
 ## Product Constraints
 - **Car and Track Selection**: A user can only select tracks availabile in Le Mans Ultimate, and can only select from the GT3 cars in the game.

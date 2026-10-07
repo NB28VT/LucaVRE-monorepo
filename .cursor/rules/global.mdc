@@ -4,6 +4,10 @@ globs: *
 alwaysApply: true
 ---
 
+# Context Routing
+* **Master Context:** Before planning any major structural changes, always reference the master application blueprint at `@docs/PRD.md`.
+* **Future Feature Planning:** When explicitly asked to summarize and plan a future feature in the middle of implementing a feature, append a description of the future feature to the `@docs/planning_roadmap.md` and write the initial high-level plan to a new, properly-named document in `@docs/features/`.
+
 # Guidelines for development
 
 - **Iterative Development**: Prefer committing small, iterative changes

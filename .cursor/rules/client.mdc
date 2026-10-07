@@ -1,6 +1,6 @@
 ---
 description: Baseline repository technical definitions and stack constraints for the LucaVRE project.
-globs: ["src/**/*"]
+globs: ["client/**/*"]
 alwaysApply: true
 ---
 
@@ -19,3 +19,11 @@ You are a senior frontend software engineer. Always write code that respects the
 - If asked to run tests, ONLY execute the direct test runner command: `npx playwright test`. 
 - Assume all browser binaries and project dependencies are already successfully installed locally by the user.
 - Prefer letting the user execute test runner commands manually unless explicitly told to run them in the chat.
+
+
+
+# Coding Standards
+- Write clean, modular, and strictly-typed [TypeScript] code.
+- Prefer functional programming patterns and descriptive variable names.
+- Keep UI components decoupled from the raw vehicle dynamics logic.
+- Do not include explanatory text before or after code blocks unless explicitly requested.

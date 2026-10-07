@@ -1,0 +1,112 @@
+---
+description: Consolidated server rules for the LucaVRE Rails API (RSpec, versioning, Anthropic SDK, git, and planning).
+globs: ["server/**/*"]
+alwaysApply: true
+---
+
+# Guidelines for development
+- **Idempotency**: Code changes must not break existing functionality. Run `bundle exec rspec` according to instructions in your .cursorrules before declaring a task complete.
+
+# Running RSpec / Bundler / Rails commands
+
+The sandboxed shell does not load chruby and injects an empty `BUNDLE_PATH`. Before `bundle`, `rspec`, or `rails`:
+
+1. **Source chruby and select Ruby 3.4.9.** Default `ruby` is system 2.6.10 (`/usr/bin/ruby`). Gems live in `~/.gem/ruby/3.4.9` only after `chruby ruby-3.4.9`.
+2. **Unset `BUNDLE_PATH`.** The sandbox points it at an empty temp cache (`.../cursor-sandbox-cache/.../bundle`).
+3. **`cd` into `LucaVRE-api`.** The workspace root has no Gemfile; Bundler will otherwise walk up to `~/Gemfile`.
+4. **Use `required_permissions: ["full_network"]`.**
+
+```bash
+source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+chruby ruby-3.4.9
+unset BUNDLE_PATH
+cd /Users/nathanburgess/PersonalApps/LucaVRE/LucaVRE-api
+bundle exec rspec spec/models/handling_deficit_spec.rb
+```
+
+Always run specs with `bundle exec rspec`.
+
+## Test scope
+
+Always run targeted specs for recently changed files first. Iterate on those until they pass. Only run the full suite as a final sanity check once the targeted specs are green.
+
+## New/pending migrations
+
+If a spec hits `PG::UndefinedTable: relation "..." does not exist`, migrate the test DB first:
+
+```bash
+source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+chruby ruby-3.4.9
+unset BUNDLE_PATH
+cd /Users/nathanburgess/PersonalApps/LucaVRE/LucaVRE-api
+RAILS_ENV=test bundle exec rails db:migrate
+```
+
+# Guidelines for building RSpec tests in this repo
+
+- **Testing Approach**: Unit and integration tests can only be built in RSpec
+- **Atomic Testing**: Tests must center on single discrete, deterministic behaviors
+- **Discrete Testing**: Tests must not unecessarily duplicate testing the same behaviors
+- **Testing Data**: ActiveRecord objects should not be created in the database without using FactoryBot
+- **Factory Usage**: Prefer the `build` method in FactoryBot to `create` where possible to speed up test setup and teardown
+- **External Service Testing**: Do not implement any automated tests that exectute a live to an external API service.
+- **Anthropic SDK Testing**: Do not implement any automated tests that execute a live call to the Anthropic SDK or any outside services. Prefer mocking the response as defined in the [Anthropic Ruby SDK Docs](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/ruby)
+- **Diagnostic request specs**: Request specs for the diagnostic submission endpoint must stub `DiagnosticService` and must not construct a live Anthropic client.
+
+# Unimplemented feature specs
+
+- Never propose or write RSpec (including pending, skipped, or `xit` examples) for a feature that is still being designed or has not been implemented.
+- For those features, write a specification document under `docs/features/` only.
+- Write tests only when implementing the feature, against that document.
+
+```markdown
+# BAD — tests for a feature that does not exist yet
+# spec/services/diagnostic_service_cache_spec.rb
+it "skips the SDK on a cache hit", pending: "caching layer not implemented yet"
+
+# GOOD — specification only until the feature is scheduled
+# docs/features/diagnostic_response_cache.md
+```
+
+# API versioning
+
+- New endpoints belong in `namespace :api` / `namespace :v1` in `config/routes.rb` and in `app/controllers/api/v1/`.
+- Controllers subclass `ActionController::API` and send and receive JSON.
+- Do not add an unversioned route. A later version gets its own namespace. Do not add new actions to an unversioned controller.
+
+# Guidelines for working with the Anthropic Ruby SDK
+
+## Context & External APIs
+- This backend interfaces with Claude using the `anthropic` Ruby gem.
+- For all SDK implementation syntax, payload structures, and error classes, rely on the official SDK documentation reference:
+  [Anthropic Ruby SDK Docs](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/ruby)
+- Do not guess parameter names or payload shapes.
+
+## Tool calling
+- Use `Anthropic::BaseTool` and `Anthropic::BaseModel` only for tool definitions and tool input schemas.
+
+## Structured outputs
+- Constrain model responses with `output_config.format`: `{ type: :json_schema, schema: { ... } }`.
+- Do not use `Anthropic::BaseModel` for response schemas.
+- Do not send `maxItems` or `maxProperties`. Anthropic's grammar does not support them (400). The only enforced array size is `minItems` of `0` or `1`. Caps such as "at most five recommendations" belong in the schema `description`.
+
+## Thought process
+- Request Claude's reasoning with `thinking: { type: :adaptive, display: :summarized }`.
+- Do not add a rationale or thinking string to the JSON schema.
+
+## Return values
+- Services return the SDK response to the caller.
+- `DiagnosticService` persists a `DiagnosticLog` for each SDK submission (recommendations from `parsed_output`, thought process from summarized thinking blocks) associated to the working session and the car, track, and handling deficits submitted with that call.
+- Do not `puts` (or otherwise print) as a stand-in for that logging layer.
+
+# Guidelines for generating XML input for the Anthropic SDK
+
+- **Scope**: when writing services that generate XML inputs for the Anthropic SDK
+- **XML Formatting Restrictions**: only input semantic, valid XML with clean, human-readable nesting and no uncessary spaces between tags. Indent all nested tags by two spaces, or whatever XML_INDENTATION is defined in app/serializers/prompt_serializers/base_xml_serializer.rb
+- **Testing assembled system prompt XML**: Only verify clean nesting and no unnecessary spacing. Compare the assembled string to `Nokogiri::XML(xml, &:noblanks).root.to_xml(indent: XML_INDENTATION)`. Do not assert tag names, inner text, or dynamically generated dictionary content. Do not use regex or line-by-line indent walkers.
+- **Pretty-print assembled ERB XML**: After rendering prompt templates, parse with `Nokogiri::XML(xml, &:noblanks)` and serialize `root.to_xml(indent: XML_INDENTATION)`. `noblanks` drops whitespace-only nodes so element-only subtrees can be re-indented. Call `root.to_xml` rather than `doc.to_xml` so the output has no XML declaration.
+- **ERB partials do not inherit parent indent**: `<%= render partial: %>` only preserves spaces on the first line of the partial. Every following line is emitted at column 0, which misaligns nesting. Start element-only partials at column 0 with internally consistent `XML_INDENTATION` and let the assembler pretty-printer place the subtree. Do not try to nest a multi-line partial by indenting the `render` call.
+- **Mixed-content elements are not re-indented**: Tags that contain both text and child elements (for example `domain_knowledge_guardrails` or `simulator_specific_quirks`) keep their original inner whitespace under Nokogiri pretty-print. Indent those children correctly in the `.xml.erb` template itself, using `XML_INDENTATION` relative to the parent tag.
+- **One indent width**: Use `XML_INDENTATION` (2 spaces) in parent templates and partials. Do not mix 2-space and 4-space tag indent.
+- **No blank lines between tags**: Do not insert empty lines between sibling tags or after an opening tag. A single paragraph break inside a text-only node is allowed. Use ERB trim (`-%>`) on loops in XML partials so Ruby block tags do not emit extra blank lines.
+

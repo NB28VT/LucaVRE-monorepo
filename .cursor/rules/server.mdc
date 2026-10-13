@@ -4,6 +4,11 @@ globs: ["server/**/*"]
 alwaysApply: true
 ---
 
+# Context Routing
+* **Anthropic SDK Services:** When making changes to behavior related to interacting with the Anthropic SDK, refer to `@docs/architecture/anthropic_sdk_service_architecture.md`
+* **Anthropic SDK Prompt Behavior:** When making changes to behavior related specifically to prompting the Anthropic SDK, refer to files that adhere to the following file naming convention:  `@docs/features/ai_prompt_*`. When writing feature documents related to prompting, follow that same naming convention.
+* **Anthropic SDK Output Behavior:** When making changes to behavior related specifically to configuring or handling output from the Anthropic SDK, refer to files that adhere to the following file naming convention:  `@docs/features/ai_output_*`. When writing feature documents related to handling SDK output, follow that same naming convention.
+
 # Guidelines for development
 - **Idempotency**: Code changes must not break existing functionality. Run `bundle exec rspec` according to instructions in your .cursorrules before declaring a task complete.
 

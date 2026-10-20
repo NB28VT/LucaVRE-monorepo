@@ -1,6 +1,6 @@
 ---
 description: Baseline repository technical definitions and stack constraints for the LucaVRE project.
-globs: ["src/**/*"]
+globs: ["client/**/*"]
 alwaysApply: true
 ---
 
@@ -19,3 +19,19 @@ You are a senior frontend software engineer. Always write code that respects the
 - If asked to run tests, ONLY execute the direct test runner command: `npx playwright test`. 
 - Assume all browser binaries and project dependencies are already successfully installed locally by the user.
 - Prefer letting the user execute test runner commands manually unless explicitly told to run them in the chat.
+
+# Frontend & Playwright Testing Standards
+- App Boot Command: `cd client && npm run dev` (Default: port 5173).
+- Test Execution Command: `cd client && npx playwright test`
+- Interactive Test Command: `cd client && npx playwright test --ui`
+
+## SDD Playwright Rules
+1. Lean heavily on existing Playwright testing patterns found in the codebase. Prioritize using semantic locators (e.g., `getByRole`, `getByText`) matching the current test baseline over fragile CSS classes.
+2. When executing a phase of an approved plan, write the Playwright test *first*.
+3. Execute the local test suite using the terminal tool to confirm a test fails before modifying source components to make it pass.
+
+# Coding Standards
+- Write clean, modular, and strictly-typed [TypeScript] code.
+- Prefer functional programming patterns and descriptive variable names.
+- Keep UI components decoupled from the raw vehicle dynamics logic.
+- Do not include explanatory text before or after code blocks unless explicitly requested.

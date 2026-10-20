@@ -1,0 +1,57 @@
+---
+description: Use this rule when the user initiates a new feature, a new page, or asks to start feature development.
+alwaysApply: false
+---
+
+# Planning & Spec-Driven Development Protocol
+
+You must strictly follow this two-phase planning protocol for every new feature build-out.
+## Phase 1: The Blueprint
+- **No Early Code**: Do not write production code or test specs until the plan is approved.
+- **Read the Requirement**: Read the human-authored feature brief located in `docs/features/[feature_name].md`.
+- **Write the Plan**: Develop the plan in plan mode.
+- **When Plan is Approved** Write a technical blueprint at `docs/feature_plans/[feature_name]_plan.md`.
+- **Plan Contents**: Include database schema modifications, internal API contracts, component structural breakdowns, and explicit Playwright/RSpec testing strategies as appropriate.
+- **Await Approval**: Stop and present the plan to the user for explicit sign-off.
+
+## Phase 2: Feature Completion & Archiving
+- **Verify Completion**: You are done only when all RSpec and Playwright suites pass cleanly.
+- **Archive the Plan**: Do not leave stale plan files in the active directory. When a plan looks complete, ask the user for permission to move `docs/plans/[feature_name]_plan.md` to `docs/archived/plans/`.
+
+# Front End Planning Protocol (Mandatory)
+- When planning front end features in `/client`, you must follow this template
+  1. Frontend Component Hierarchy (Props, State, Hooks)
+  2. Data Flow & Rails API Integration points (TanStack Query/Axios mapping)
+  3. Spec Blueprint (A numbered list of exact unit and integration tests to be written)
+  4. Step-by-Step Implementation Phases
+- Stop and explicitly ask the user for review and approval of this plan before writing any tests or code.
+
+# Planning roadmap
+When the user asks to make a plan for something to **design in the future** (specify now, implement later):
+- Propose adding a short summary of that feature to `docs/planning_roadmap.md`.
+- The summary should state the problem that it is not in the current implementation pass.
+- Do not implement the future feature in that pass unless the user explicitly asks to build it.
+
+```markdown
+# BAD
+Plan a future cache, then also implement it in the same pass.
+
+# GOOD
+Plan the cache, write docs/features/diagnostic_response_cache.md,
+and propose a summary entry on docs/planning_roadmap.md.
+```
+
+# Split large plans
+- Split large plans into discrete logical parts that can be reviewed and committed independently (for example implementation, then a future-feature spec, then roadmap or process rules).
+- Each part is one concern. Do not mix shipping code with deferred-design docs in the same part unless they cannot stand alone.
+- After finishing a part, stop and let the user commit. Do not start the next part until they ask.
+
+```markdown
+# BAD
+One plan step that adds DiagnosticLog, a cache spec, and roadmap rules together.
+
+# GOOD
+Part 1: logging layer, then stop.
+Part 2: cache specification, then stop.
+Part 3: planning roadmap and process rules, then stop.
+```

@@ -1,0 +1,45 @@
+---
+description: Core mission, behavioral boundaries, development rules, and safety guardrails
+globs: *
+alwaysApply: true
+---
+
+# Context Routing
+* **Master Context:** Before planning any major structural changes, always reference the master application blueprint at `@docs/PRD.md`.
+
+# Guidelines for development
+- **Iterative Development**: Prefer committing small, iterative changes
+- **Git Commits**: Do not commit code changes to git unless given permission to do so. Ask when you are ready to do this.
+
+When you finish implementation that leaves uncommitted changes in this repo:
+
+- Do not stage files or run `git commit` unless the user explicitly asks you to commit in that message.
+- End the response with one fenced shell block per commit-sized part. Each block must be ready to paste into a terminal from the root directory.
+- List only the paths that belong in that commit. Do not `git add -A` or `git add .`.
+- Match this repository's short title-plus-why style: one title line, a blank line, then one sentence on why.
+- If the work was split so the user can commit between parts, give a separate block for each part.
+
+```bash
+git add app/controllers/api/v1/diagnostics_controller.rb config/routes.rb
+git commit -m "$(cat <<'EOF'
+Add diagnostic submission endpoint
+
+Give the frontend a v1 POST that returns setup recommendations without the thought process.
+
+EOF
+)"
+```
+
+# Booting the Application
+To run the full stack application:
+- Backend: `cd server && bundle exec rails server -p 3000`
+- Frontend: `cd client && npm run dev` (Runs on port 5173)
+
+# Running Tests (Spec-Driven Development)
+Always run tests before declaring a task complete.
+- Backend Specs: `cd server && bundle exec rspec <path_to_spec>`  **Do Not** run backend specs for frontend changes
+- Frontend Specs: `cd client && npm run test` or `npm run test:ui` **Do Not** run frontend specs for backend changes unless the changes affect API output.
+
+## Product Constraints
+- **Car and Track Selection**: A user can only select tracks availabile in Le Mans Ultimate, and can only select from the GT3 cars in the game.
+- **Setup Changes**: The Anthropic LLM can only recommend setup changes that are available in Le Mans Ultimate.

@@ -30,7 +30,6 @@ You are a senior frontend software engineer. Always write code that respects the
 2. When executing a phase of an approved plan, write the Playwright test *first*.
 3. Execute the local test suite using the terminal tool to confirm a test fails before modifying source components to make it pass.
 
-
 # Coding Standards
 - Write clean, modular, and strictly-typed [TypeScript] code.
 - Prefer functional programming patterns and descriptive variable names.

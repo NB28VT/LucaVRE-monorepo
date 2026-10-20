@@ -1,12 +1,11 @@
 ---
-description: System-wide core mission, behavioral boundaries, development rules, and safety guardrails
+description: Core mission, behavioral boundaries, development rules, and safety guardrails
 globs: *
 alwaysApply: true
 ---
 
 # Context Routing
 * **Master Context:** Before planning any major structural changes, always reference the master application blueprint at `@docs/PRD.md`.
-* **Future Feature Planning:** When explicitly asked to summarize and plan a future feature in the middle of implementing a feature, append a description of the future feature to the `@docs/planning_roadmap.md` and write the initial high-level plan to a new, properly-named document in `@docs/features/`.
 
 # Guidelines for development
 - **Iterative Development**: Prefer committing small, iterative changes
@@ -38,18 +37,9 @@ To run the full stack application:
 
 # Running Tests (Spec-Driven Development)
 Always run tests before declaring a task complete.
-
 - Backend Specs: `cd server && bundle exec rspec <path_to_spec>`  **Do Not** run backend specs for frontend changes
 - Frontend Specs: `cd client && npm run test` or `npm run test:ui` **Do Not** run frontend specs for backend changes unless the changes affect API output.
 
 ## Product Constraints
 - **Car and Track Selection**: A user can only select tracks availabile in Le Mans Ultimate, and can only select from the GT3 cars in the game.
 - **Setup Changes**: The Anthropic LLM can only recommend setup changes that are available in Le Mans Ultimate.
-
-## Domain Vocabulary and Data Models
-- **Car** (ActiveFile::Base data source): the metadata for the selected car, (e.g. Porsche 911 LMGT3 R (992)), stored in JSON metadata in db/data/cars.json.
-- **Track** (ActiveFile::Base data source): the metadata for the selected track, (e.g. Monza), stored in JSON metadata in db/data/tracks.json.
-- **Working Session** (ActiveRecord model): a single combination of a track and car a user is working on.
-- **Handling Deficit** (ActiveRecord model): the location on track (high-speed, medium-speed or low-speed corners), the phase of the corner (entry, mid-corner, exit) and the car behavior (understeer or oversteer) they are trying to address when making setup changes to the car. A Working Session can have one or more handling deficits
-- **Diagnostic Log** (ActiveRecord model): one Anthropic SDK submission from `DiagnosticService`. Stores the structured setup recommendations and summarized thought process, associated to the working session and the car, track, and handling deficits submitted with that call. A Working Session can have a history of diagnostic logs.
-

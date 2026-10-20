@@ -4,13 +4,25 @@ globs: ["server/**/*"]
 alwaysApply: true
 ---
 
+## API Endpoints
+- **API Versioning**: All API endpoints are versioned under api/X, where X is the version. (v1 is the initial version)
+- **API Formatting**: All API endpoints send and receive data in JSON.
+- **API Constraints**: POST routes must only accept a car, track and list of handling deficits. A user cannot create any additional data.
+
+## Backend Architecture
+- **Serializers**: metadata for cars, tracks and handling deficits is serialized to XML in `app/serializers/prompt_serializers/*`
+- **Dictionaries**: Luca VRE uses prompt compression to minimize token usage for non-static data. The key-value mappings that drive compression and the translation instructions for the Anthropic SDK are defined in `app/dictionaries`
+- **Prompts**: XML prompt structures are defined in `app/views/*`, as any data views would be in a Ruby on Rails application.
+
 # Context Routing
 * **Anthropic SDK Services:** When making changes to behavior related to interacting with the Anthropic SDK, refer to `@docs/architecture/anthropic_sdk_service_architecture.md`
-* **Anthropic SDK Prompt Behavior:** When making changes to behavior related specifically to prompting the Anthropic SDK, refer to files that adhere to the following file naming convention:  `@docs/features/ai_prompt_*`. When writing feature documents related to prompting, follow that same naming convention.
-* **Anthropic SDK Output Behavior:** When making changes to behavior related specifically to configuring or handling output from the Anthropic SDK, refer to files that adhere to the following file naming convention:  `@docs/features/ai_output_*`. When writing feature documents related to handling SDK output, follow that same naming convention.
+* **Anthropic SDK Prompt Behavior:** When making changes to behavior related specifically to prompting the Anthropic SDK, refer to files that adhere to the following file naming convention:  `@docs/archived/features/ai_prompt_*`. When writing feature documents related to prompting, follow that same naming convention.
+* **Anthropic SDK Output Behavior:** When making changes to behavior related specifically to configuring or handling output from the Anthropic SDK, refer to files that adhere to the following file naming convention:  `@docs/archived/features/ai_output_*`. When writing feature documents related to handling SDK output, follow that same naming convention.
 
 # Guidelines for development
 - **Idempotency**: Code changes must not break existing functionality. Run `bundle exec rspec` according to instructions in your .cursorrules before declaring a task complete.
+- **UI Review**: When building UI components, stop after generating the code and ask the user to verify the changes in the Cursor Simple Browser (`http://localhost:5173`) before proceeding to the next architectural step.
+- **API Sync**: When writing frontend code, always check the corresponding backend API endpoint contracts or type definitions to prevent drift
 
 # Running RSpec / Bundler / Rails commands
 
@@ -59,7 +71,6 @@ RAILS_ENV=test bundle exec rails db:migrate
 - **Diagnostic request specs**: Request specs for the diagnostic submission endpoint must stub `DiagnosticService` and must not construct a live Anthropic client.
 
 # Unimplemented feature specs
-
 - Never propose or write RSpec (including pending, skipped, or `xit` examples) for a feature that is still being designed or has not been implemented.
 - For those features, write a specification document under `docs/features/` only.
 - Write tests only when implementing the feature, against that document.
@@ -74,7 +85,6 @@ it "skips the SDK on a cache hit", pending: "caching layer not implemented yet"
 ```
 
 # API versioning
-
 - New endpoints belong in `namespace :api` / `namespace :v1` in `config/routes.rb` and in `app/controllers/api/v1/`.
 - Controllers subclass `ActionController::API` and send and receive JSON.
 - Do not add an unversioned route. A later version gets its own namespace. Do not add new actions to an unversioned controller.

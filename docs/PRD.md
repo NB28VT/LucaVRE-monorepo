@@ -14,33 +14,3 @@ So that I can prevent the car from oversteering on exit in low-speed corners
 As a user driving the Ford Mustang LMGT3 on the Monza circuit
 I need to ask Claude what setup changes to make to my car
 So that I can prevent the car from understeering mid-corner in high-speed corners
-
-## Technology Stack
-- **API Framework**: the API is built in Ruby on Rails
-- **LLM Integration**: the app interfaces with Anthropic Claude via the Anthropic Ruby SDK, using the `anthropic` gem
-- **Automated Testing Framework**: RSpec Rails
-- **Automated Testing Data Generation**: FactoryBot
-- **Database Engine**: PostgreSQL
-- **Front End Framework**: the front end is in the /client directory and is built with React.js with TypeScript and TanStack Query for calls to the API.
-
-## Product Constraints
-- **Car and Track Selection**: A user can only select tracks availabile in Le Mans Ultimate, and can only select from the GT3 cars in the game.
-- **Setup Changes**: The Anthropic LLM can only recommend setup changes that are available in Le Mans Ultimate.
-
-## Domain Vocabulary and Data Models
-- **Car** (ActiveFile::Base data source): the metadata for the selected car, (e.g. Porsche 911 LMGT3 R (992)), stored in JSON metadata in db/data/cars.json.
-- **Track** (ActiveFile::Base data source): the metadata for the selected track, (e.g. Monza), stored in JSON metadata in db/data/tracks.json.
-- **Working Session** (ActiveRecord model): a single combination of a track and car a user is working on.
-- **Handling Deficit** (ActiveRecord model): the location on track (high-speed, medium-speed or low-speed corners), the phase of the corner (entry, mid-corner, exit) and the car behavior (understeer or oversteer) they are trying to address when making setup changes to the car. A Working Session can have one or more handling deficits
-- **Diagnostic Log** (ActiveRecord model): one Anthropic SDK submission from `DiagnosticService`. Stores the structured setup recommendations and summarized thought process, associated to the working session and the car, track, and handling deficits submitted with that call. A Working Session can have a history of diagnostic logs.
-
-## API Endpoints
-- **API Versioning**: All API endpoints are versioned under api/X, where X is the version. (v1 is the initial version)
-- **API Formatting**: All API endpoints send and receive data in JSON.
-- **API Constraints**: POST routes must only accept a car, track and list of handling deficits. A user cannot create any additional data.
-
-## Backend Architecture
-- **Serializers**: metadata for cars, tracks and handling deficits is serialized to XML in `app/serializers/prompt_serializers/*`
-- **Dictionaries**: Luca VRE uses prompt compression to minimize token usage for non-static data. The key-value mappings that drive compression and the translation instructions for the Anthropic SDK are defined in `app/dictionaries`
-- **Prompts**: XML prompt structures are defined in `app/views/*`, as any data views would be in a Ruby on Rails application.
-

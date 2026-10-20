@@ -9,7 +9,6 @@ alwaysApply: true
 * **Future Feature Planning:** When explicitly asked to summarize and plan a future feature in the middle of implementing a feature, append a description of the future feature to the `@docs/planning_roadmap.md` and write the initial high-level plan to a new, properly-named document in `@docs/features/`.
 
 # Guidelines for development
-
 - **Iterative Development**: Prefer committing small, iterative changes
 - **Git Commits**: Do not commit code changes to git unless given permission to do so. Ask when you are ready to do this.
 
@@ -31,36 +30,26 @@ Give the frontend a v1 POST that returns setup recommendations without the thoug
 EOF
 )"
 ```
-# Planning roadmap
 
-When the user asks to make a plan for something to **design in the future** (specify now, implement later):
-- Propose adding a short summary of that feature to `docs/planning_roadmap.md`.
-- The summary should state the problem, that it is not in the current implementation pass, and link to the `docs/features/` specification if one is being written or already exists.
-- Do not implement the future feature in that pass unless the user explicitly asks to build it.
+# Booting the Application
+To run the full stack application:
+- Backend: `cd server && bundle exec rails server -p 3000`
+- Frontend: `cd client && npm run dev` (Runs on port 5173)
 
-Skip the proposal when the user is asking to implement something now. Remove the item from the roadmap when it ships.
+# Running Tests (Spec-Driven Development)
+Always run tests before declaring a task complete.
 
-```markdown
-# BAD
-Plan a future cache, then also implement it in the same pass.
+- Backend Specs: `cd server && bundle exec rspec <path_to_spec>`  **Do Not** run backend specs for frontend changes
+- Frontend Specs: `cd client && npm run test` or `npm run test:ui` **Do Not** run frontend specs for backend changes unless the changes affect API output.
 
-# GOOD
-Plan the cache, write docs/features/diagnostic_response_cache.md,
-and propose a summary entry on docs/planning_roadmap.md.
-```
+## Product Constraints
+- **Car and Track Selection**: A user can only select tracks availabile in Le Mans Ultimate, and can only select from the GT3 cars in the game.
+- **Setup Changes**: The Anthropic LLM can only recommend setup changes that are available in Le Mans Ultimate.
 
-# Split large plans
+## Domain Vocabulary and Data Models
+- **Car** (ActiveFile::Base data source): the metadata for the selected car, (e.g. Porsche 911 LMGT3 R (992)), stored in JSON metadata in db/data/cars.json.
+- **Track** (ActiveFile::Base data source): the metadata for the selected track, (e.g. Monza), stored in JSON metadata in db/data/tracks.json.
+- **Working Session** (ActiveRecord model): a single combination of a track and car a user is working on.
+- **Handling Deficit** (ActiveRecord model): the location on track (high-speed, medium-speed or low-speed corners), the phase of the corner (entry, mid-corner, exit) and the car behavior (understeer or oversteer) they are trying to address when making setup changes to the car. A Working Session can have one or more handling deficits
+- **Diagnostic Log** (ActiveRecord model): one Anthropic SDK submission from `DiagnosticService`. Stores the structured setup recommendations and summarized thought process, associated to the working session and the car, track, and handling deficits submitted with that call. A Working Session can have a history of diagnostic logs.
 
-- Split large plans into discrete logical parts that can be reviewed and committed independently (for example implementation, then a future-feature spec, then roadmap or process rules).
-- Each part is one concern. Do not mix shipping code with deferred-design docs in the same part unless they cannot stand alone.
-- After finishing a part, stop and let the user commit. Do not start the next part until they ask.
-
-```markdown
-# BAD
-One plan step that adds DiagnosticLog, a cache spec, and roadmap rules together.
-
-# GOOD
-Part 1: logging layer, then stop.
-Part 2: cache specification, then stop.
-Part 3: planning roadmap and process rules, then stop.
-```

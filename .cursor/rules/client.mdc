@@ -16,9 +16,13 @@ You are a senior frontend software engineer. Always write code that respects the
 
 # Playwright & Terminal Execution Constraints
 - NEVER run `npx playwright install` or try to download browser binaries (chromium, firefox, webkit) in the terminal.
+- ALWAYS navigate to the client folder (`cd client`) before running Playwright commands.
+- ALWAYS use the specific client-level config path: `npx playwright test --config=playwright.config.ts`
+- NEVER scan or use global system caches outside the project workspace folder.
 - If asked to run tests, ONLY execute the direct test runner command: `npx playwright test`. 
 - Assume all browser binaries and project dependencies are already successfully installed locally by the user.
 - Prefer letting the user execute test runner commands manually unless explicitly told to run them in the chat.
+- Never walk through a browser flow yourself, always ask the user when you are ready for them to test manually, and give them brief instructions on how to get to the behavior we want to manually verify. Add this to your client rules
 
 # Frontend & Playwright Testing Standards
 - App Boot Command: `cd client && npm run dev` (Default: port 5173).

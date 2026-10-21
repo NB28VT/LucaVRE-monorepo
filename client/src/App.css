@@ -412,6 +412,21 @@ button {
   border-color: var(--color-accent-hover);
 }
 
+.diagnose-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.diagnose-button:disabled:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.diagnose-button-hit:has(.diagnose-button:disabled) {
+  cursor: not-allowed;
+}
+
 .handling-characteristics-card {
   display: flex;
   flex-direction: column;
@@ -594,8 +609,8 @@ button {
 
 .modal-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--spacing-sm);
 }
 
@@ -603,9 +618,12 @@ button {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
+  text-align: center;
 }
 
 .modal-close {
+  order: -1;
+  align-self: flex-end;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;

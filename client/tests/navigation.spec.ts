@@ -100,6 +100,7 @@ test.describe('Page navigation', () => {
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
+    await addHandlingCharacteristic(page, 'Oversteer');
     await page.getByRole('button', { name: 'Diagnose' }).click();
 
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
@@ -114,6 +115,7 @@ test.describe('Page navigation', () => {
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
+    await addHandlingCharacteristic(page, 'Oversteer');
     await page.getByRole('button', { name: 'Diagnose' }).click();
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
 
@@ -202,6 +204,7 @@ test.describe('Page navigation', () => {
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
+    await addHandlingCharacteristic(page, 'Oversteer');
     await page.getByRole('button', { name: 'Diagnose' }).click();
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
 
@@ -290,6 +293,7 @@ test.describe('Page navigation', () => {
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
+    await addHandlingCharacteristic(page, 'Oversteer');
     await page.getByRole('button', { name: 'Diagnose' }).click();
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
 
@@ -312,6 +316,7 @@ test.describe('Page navigation', () => {
     await page.getByLabel('Track').selectOption({ label: 'Spa-Francorchamps' });
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
+    await addHandlingCharacteristic(page, 'Oversteer');
     await page.getByRole('button', { name: 'Diagnose' }).click();
     await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
 

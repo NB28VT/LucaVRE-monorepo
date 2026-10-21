@@ -4,6 +4,7 @@ import SessionHeader from '@/components/SessionHeader.tsx';
 import ViewTopBar from '@/components/ViewTopBar.tsx';
 import HandlingCharacteristicModal from '@/components/HandlingCharacteristicModal.tsx';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal.tsx';
+import HandlingCharacteristicRequiredModal from '@/components/HandlingCharacteristicRequiredModal.tsx';
 import { useCreateHandlingDeficit } from '@/hooks/useCreateHandlingDeficit.ts';
 import { useUpdateHandlingDeficit } from '@/hooks/useUpdateHandlingDeficit.ts';
 import { useDeleteHandlingDeficit } from '@/hooks/useDeleteHandlingDeficit.ts';
@@ -100,6 +101,7 @@ function CurrentSessionPage({
   const [deletingCharacteristic, setDeletingCharacteristic] =
     useState<HandlingCharacteristic | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false);
 
   useEffect(() => {
     if (!handlingDeficits) {
@@ -248,6 +250,14 @@ function CurrentSessionPage({
     setDeleteError(null);
   }
 
+  function handleDiagnoseAttempt(): void {
+    if (handlingCharacteristics.length > 0) {
+      return;
+    }
+
+    setIsRequirementModalOpen(true);
+  }
+
   function handleConfirmDelete(): void {
     if (!deletingCharacteristic || workingSessionId == null) {
       return;
@@ -357,9 +367,20 @@ function CurrentSessionPage({
         </button>
       </div>
 
-      <button type="button" className="submit-button" onClick={onSubmit}>
-        Diagnose
-      </button>
+      <div className="diagnose-button-hit" onClick={handleDiagnoseAttempt}>
+        <button
+          type="button"
+          className="submit-button diagnose-button"
+          onClick={onSubmit}
+          disabled={handlingCharacteristics.length === 0}
+        >
+          Diagnose
+        </button>
+      </div>
+
+      {isRequirementModalOpen && (
+        <HandlingCharacteristicRequiredModal onClose={() => setIsRequirementModalOpen(false)} />
+      )}
 
       {isModalOpen && (
         <HandlingCharacteristicModal

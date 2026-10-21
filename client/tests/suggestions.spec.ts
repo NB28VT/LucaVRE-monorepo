@@ -10,6 +10,12 @@ import {
   addHandlingCharacteristic,
   deleteHandlingCharacteristic,
 } from './helpers/handlingCharacteristics';
+import {
+  mockCreateDiagnosticEmpty,
+  mockCreateDiagnosticError,
+  mockCreateDiagnosticHeld,
+  mockCreateDiagnosticSuccess,
+} from './helpers/diagnosticApi';
 
 test.describe('Setup diagnosis submission', () => {
   test.beforeEach(async ({ page }) => {
@@ -17,6 +23,7 @@ test.describe('Setup diagnosis submission', () => {
     await mockCreateWorkingSessionSuccess(page);
     await mockHandlingDeficitsList(page, 1, []);
     await mockCreateHandlingDeficitSuccess(page, 1);
+    await mockCreateDiagnosticSuccess(page);
 
     await page.goto('http://localhost:5173');
     await page.getByRole('button', { name: 'New Session' }).click();
@@ -153,15 +160,62 @@ test.describe('Setup diagnosis submission', () => {
     const suggestionsList = page.getByRole('list');
     await expect(suggestionsList.getByRole('listitem')).toHaveCount(3);
 
-    await expect(
-      page.getByText('Stiffen the front anti-roll bar by one click to sharpen turn-in response'),
-    ).toBeVisible();
-    await expect(
-      page.getByText('Lower rear tire pressures by 1.5 psi to increase mid-corner contact patch'),
-    ).toBeVisible();
-    await expect(
-      page.getByText('Increase brake bias rearward by 2% to reduce entry understeer'),
-    ).toBeVisible();
+    await expect(page.getByText('Brake bias: 52.0%')).toBeVisible();
+    await expect(page.getByText('Front anti-roll bar: 5')).toBeVisible();
+    await expect(page.getByText('Tire pressures: 145 kPa')).toBeVisible();
+  });
+
+  test('posts Diagnose to the working session diagnostic endpoint', async ({ page }) => {
+    await addHandlingCharacteristic(page, 'Oversteer');
+
+    const requestPromise = page.waitForRequest(
+      (request) =>
+        request.method() === 'POST' && request.url().includes('/diagnostic'),
+    );
+    await page.getByRole('button', { name: 'Diagnose' }).click();
+    const request = await requestPromise;
+
+    expect(request.url()).toContain('/api/v1/working_sessions/1/diagnostic');
+    expect(request.postData() ?? '').toBe('');
+  });
+
+  test('disables Diagnose and shows Diagnosing… while the request is in flight', async ({
+    page,
+  }) => {
+    const releaseDiagnostic = await mockCreateDiagnosticHeld(page);
+    await addHandlingCharacteristic(page, 'Oversteer');
+
+    await page.getByRole('button', { name: 'Diagnose' }).click();
+
+    const diagnosing = page.getByRole('button', { name: 'Diagnosing…' });
+    await expect(diagnosing).toBeDisabled();
+    await expect(diagnosing).toHaveAttribute('aria-busy', 'true');
+
+    releaseDiagnostic();
+    await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
+  });
+
+  test('shows an empty message when the diagnostic returns no recommendations', async ({
+    page,
+  }) => {
+    await mockCreateDiagnosticEmpty(page);
+    await addHandlingCharacteristic(page, 'Oversteer');
+    await page.getByRole('button', { name: 'Diagnose' }).click();
+
+    await expect(page.getByText('No setup changes recommended.')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).toBeVisible();
+  });
+
+  test('stays on Current Session when the diagnostic request returns errors', async ({
+    page,
+  }) => {
+    await mockCreateDiagnosticError(page);
+    await addHandlingCharacteristic(page, 'Oversteer');
+    await page.getByRole('button', { name: 'Diagnose' }).click();
+
+    await expect(page.getByRole('alert')).toHaveText('Setup recommendation request timed out');
+    await expect(page.getByRole('region', { name: 'Current Session' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Suggested Setup Changes' })).not.toBeVisible();
   });
 
   test('returns to the Current Session page when Back is clicked from the suggestions view', async ({

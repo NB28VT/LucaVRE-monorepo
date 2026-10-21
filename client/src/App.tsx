@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { CurrentView, SavedSession } from '@/types/session.ts';
 import type { HandlingCharacteristic } from '@/types/handlingCharacteristic.ts';
+import type { SetupRecommendations } from '@/types/diagnostic.ts';
 import type { WorkingSession } from '@/types/workingSession.ts';
 import StartPage from '@/pages/StartPage.tsx';
 import LoadSessionPage from '@/pages/LoadSessionPage.tsx';
@@ -19,6 +20,7 @@ function App() {
   const [handlingCharacteristics, setHandlingCharacteristics] = useState<
     HandlingCharacteristic[]
   >([]);
+  const [recommendations, setRecommendations] = useState<SetupRecommendations | null>(null);
   const seededSessionIdRef = useRef<number | null>(null);
 
   function handleSelectCarId(carId: string, carName: string): void {
@@ -68,7 +70,8 @@ function App() {
     setCurrentView('new');
   }
 
-  function handleSubmitDiagnosis(): void {
+  function handleSubmitDiagnosis(nextRecommendations: SetupRecommendations): void {
+    setRecommendations(nextRecommendations);
     setCurrentView('results');
   }
 
@@ -83,6 +86,7 @@ function App() {
     setSelectedTrackName('');
     setWorkingSessionId(null);
     setHandlingCharacteristics([]);
+    setRecommendations(null);
     seededSessionIdRef.current = null;
     setCurrentView('start');
   }
@@ -170,10 +174,15 @@ function App() {
           />
         );
       case 'results':
+        if (!recommendations) {
+          return null;
+        }
+
         return (
           <ResultsPage
             carName={selectedCarName}
             trackName={selectedTrackName}
+            recommendations={recommendations}
             onBack={handleReturnToSession}
             onNewSession={handleStartNewSession}
             onGoHome={handleReturnToStart}

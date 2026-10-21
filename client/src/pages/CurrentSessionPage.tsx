@@ -5,11 +5,13 @@ import ViewTopBar from '@/components/ViewTopBar.tsx';
 import HandlingCharacteristicModal from '@/components/HandlingCharacteristicModal.tsx';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal.tsx';
 import HandlingCharacteristicRequiredModal from '@/components/HandlingCharacteristicRequiredModal.tsx';
+import { useCreateDiagnostic } from '@/hooks/useCreateDiagnostic.ts';
 import { useCreateHandlingDeficit } from '@/hooks/useCreateHandlingDeficit.ts';
 import { useUpdateHandlingDeficit } from '@/hooks/useUpdateHandlingDeficit.ts';
 import { useDeleteHandlingDeficit } from '@/hooks/useDeleteHandlingDeficit.ts';
 import { useHandlingDeficits } from '@/hooks/useHandlingDeficits.ts';
 import { LOCATION_LABELS, PHASE_LABELS, SYMPTOM_LABELS } from '@/types/handlingCharacteristic.ts';
+import type { SetupRecommendations } from '@/types/diagnostic.ts';
 import type {
   HandlingCharacteristic,
   Location,
@@ -32,7 +34,7 @@ interface CurrentSessionPageProps {
   onBack: () => void;
   onNewSession: () => void;
   onGoHome: () => void;
-  onSubmit: () => void;
+  onSubmit: (recommendations: SetupRecommendations) => void;
 }
 
 function formatLocationPhaseLabel(characteristic: HandlingCharacteristic): string {
@@ -91,6 +93,7 @@ function CurrentSessionPage({
     useUpdateHandlingDeficit();
   const { mutate: deleteHandlingDeficit, isPending: isDeletingDeficit } =
     useDeleteHandlingDeficit();
+  const { mutate: createDiagnostic, isPending: isDiagnosing } = useCreateDiagnostic();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCharacteristicId, setEditingCharacteristicId] = useState<string | null>(null);
@@ -102,6 +105,7 @@ function CurrentSessionPage({
     useState<HandlingCharacteristic | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false);
+  const [diagnosticError, setDiagnosticError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!handlingDeficits) {
@@ -258,6 +262,30 @@ function CurrentSessionPage({
     setIsRequirementModalOpen(true);
   }
 
+  function handleDiagnose(): void {
+    if (isDiagnosing || workingSessionId == null || handlingCharacteristics.length === 0) {
+      return;
+    }
+
+    setDiagnosticError(null);
+    createDiagnostic(workingSessionId, {
+      onSuccess: (nextRecommendations) => {
+        onSubmit(nextRecommendations);
+      },
+      onError: (error) => {
+        if (
+          isAxiosError<{ errors?: string[] }>(error) &&
+          Array.isArray(error.response?.data?.errors)
+        ) {
+          setDiagnosticError(error.response.data.errors.join(' '));
+          return;
+        }
+
+        setDiagnosticError('Failed to load setup recommendations.');
+      },
+    });
+  }
+
   function handleConfirmDelete(): void {
     if (!deletingCharacteristic || workingSessionId == null) {
       return;
@@ -367,14 +395,17 @@ function CurrentSessionPage({
         </button>
       </div>
 
+      {diagnosticError && <p role="alert">{diagnosticError}</p>}
+
       <div className="diagnose-button-hit" onClick={handleDiagnoseAttempt}>
         <button
           type="button"
           className="submit-button diagnose-button"
-          onClick={onSubmit}
-          disabled={handlingCharacteristics.length === 0}
+          onClick={handleDiagnose}
+          disabled={isDiagnosing || workingSessionId == null || handlingCharacteristics.length === 0}
+          aria-busy={isDiagnosing}
         >
-          Diagnose
+          {isDiagnosing ? 'Diagnosing…' : 'Diagnose'}
         </button>
       </div>
 

@@ -65,7 +65,11 @@ class DiagnosticService
 
   def initialize(
     working_session:,
-    anthropic_sdk_service: AnthropicSdkService.new,
+    anthropic_sdk_service: (
+      Rails.application.config.x.diagnostic.use_mock_sdk ?
+        MockAnthropicSdkService.new :
+        AnthropicSdkService.new
+    ),
     system_rules_assembler: SystemRulesAssembler.new
   )
     @working_session = working_session

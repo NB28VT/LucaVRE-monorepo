@@ -88,5 +88,34 @@ RSpec.describe "Diagnostics API", type: :request do
         { "errors" => ["Setup recommendation request timed out"] }
       )
     end
+
+    context "when the mock SDK is the default collaborator" do
+      let(:working_session) do
+        create(:working_session, car_id: "ferrari_296_lmgt3", track_id: "spa_francorchamps_gp")
+      end
+
+      before do
+        allow(DiagnosticService).to receive(:new).and_call_original
+      end
+
+      it "returns camelCase mock recommendations and omits the thought process" do
+        post path
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)).to eq(
+          "recommendations" => MockAnthropicSdkService::PARSED_OUTPUT.transform_keys { |key| key.camelize(:lower) }
+        )
+        expect(response.body).not_to include(MockAnthropicSdkService::THOUGHT_PROCESS)
+        expect(response.body).not_to include("thoughtProcess")
+      end
+
+      it "persists a diagnostic log for the mock response" do
+        expect { post path }.to change(DiagnosticLog, :count).by(1)
+
+        log = DiagnosticLog.last
+        expect(log.recommendations).to eq(MockAnthropicSdkService::PARSED_OUTPUT)
+        expect(log.thought_process).to eq(MockAnthropicSdkService::THOUGHT_PROCESS)
+      end
+    end
   end
 end
